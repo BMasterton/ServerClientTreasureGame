@@ -7,4 +7,5 @@ from Tile import Tile
 def display(myBoard: Board):
     for row in myBoard.board:
         for tile in row:
-            print(tile)
+            print(tile, end = " " )
+        print('\n')

@@ -7,4 +7,7 @@ class Tile:
         self.description = description
 
     def __str__(self):
-        return f'{self.description}({self.treasure})'
+        if self.treasure:
+            return self.treasure.description
+        else:
+            return self.description
