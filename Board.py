@@ -1,8 +1,8 @@
 from Treasure import Treasure
 from Tile import Tile
 from Player import Player
-
 import random
+
 
 # constructor for the board object
 class Board:
@@ -27,9 +27,28 @@ class Board:
                 randNumX = random.randrange(0, 10)
                 randNumY = random.randrange(0, 10)
             self.board[randNumX][randNumY].treasure = Treasure(treasureValue)
+    # as an example bob would be the key and the values would be the x and y coords
+    players = {
+        "name": None,
+    }
 
     def add_player(self, name, xCord, yCord):
        self.board[xCord][yCord].add_player(Player(name))
+       self.players[name] = xCord, yCord
+       print(self.players[name])
+        #put this made player and coords into its own dictionary
+
+    def move_player(self, name, direction):
+        # need to check the location of the current player by nanme via the dictironary
+        # need to have a if else nightmare with u d l r
+        # need to have a check for the sides of the map, if they are
+        #larger than 10 on the x and y and less than 1 on the x and y, you need to throw
+        # a ValueError saying no, and dont do the move.
+
+
+        return 0
+
+
 
 
 
