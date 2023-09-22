@@ -71,7 +71,7 @@ class Board:
                     # exit the program
                 case _:
                     print()
-        except valueError as details:
+        except ValueError as details:
             print(str(details))
 
 
