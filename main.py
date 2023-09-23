@@ -20,4 +20,16 @@ for player in playerNames:
 
 # going to have to add all the text and loops for adking for more commands and more here it will
 # have to repeadely the board
-display(newBoard)
+for i in range(3):
+    display(newBoard)
+    playerInputDirection = input(str('(U)p (D)own (L)eft (R)ight (Q)uit \n'))
+    playerInputPlayer = input(str('Player 1 or 2 \n'))
+    #match may be better here
+    if playerInputPlayer == '1':
+        Board.move_player(playerNames[0], playerInputDirection)
+    else:
+        Board.move_player(playerNames[1], playerInputDirection)
+
+
+
+

@@ -44,7 +44,7 @@ class Board:
 
        #put this made player and coords into its own dictionary
 
-    def move_player(self, name, direction: chr):
+    def move_player(self, name, direction):
         # need to check the location of the current player by name via the dictironary
         # this is the x and y coord of a player the value of the key value players dict
 
@@ -53,18 +53,17 @@ class Board:
         name = list(self.players.keys())[list(self.players.values()).index(self.players[name])]
         print(name)
 
-
-
         try:
             match direction:
                 case 'u' | 'U':
                     # current location of the active players x and y location
                     initialXLocation = self.players[name][0]
                     initialYLocation = self.players[name][1]
-                    if(initialYLocation == 9):
-                        raise ValueError('Cannot go up, out of bounds')
-                    # new player location based on up command
                     newYLocation = initialYLocation + 1
+                    #checking if the user is out of bounds or if the spot is occupies by anything else
+                    if(initialYLocation == 9 | self.board[initialXLocation][newYLocation].description != '.'):
+                        raise ValueError('Inaccessible spot')
+                    # new player location based on up command
                     #setting the dictionaries value to the new changed location value
                     self.players[name][1] = newYLocation
                     #change the location of the player icon, by changing the . to a player name icon
