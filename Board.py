@@ -34,41 +34,60 @@ class Board:
 
     def add_player(self, name, xCord, yCord):
        self.board[xCord][yCord].add_player(Player(name))
-       self.players[name] = xCord, yCord
-       print(self.players[name])
+       self.players[name] = [xCord, yCord]
+       # print(self.players[name])
+       # name = list(self.players.keys())[list(self.players.values()).index(self.players[name])]
+       # print(name)
+       # currLocation = self.players[name][0]
+       # print(currLocation)
 
 
-        #put this made player and coords into its own dictionary
+       #put this made player and coords into its own dictionary
 
-    def move_player(self, name, direction: char):
+    def move_player(self, name, direction: chr):
         # need to check the location of the current player by name via the dictironary
         # this is the x and y coord of a player the value of the key value players dict
-        currLocation = self.players[name]
+
         print(list(self.players.keys())[list(self.players.values()).index(self.players[name])])
         # this is the name of the player the key of the dict, based on the coords value
         name = list(self.players.keys())[list(self.players.values()).index(self.players[name])]
         print(name)
 
+
+
         try:
             match direction:
-                case 'u' | 'P':
-                    # move y coord up 1 +=1
-                # if the y coord is at the edge so 10 then you cannot go up
-                #throw valueError
+                case 'u' | 'U':
+                    # current location of the active players x and y location
+                    initialXLocation = self.players[name][0]
+                    initialYLocation = self.players[name][1]
+                    if(initialYLocation == 9):
+                        raise ValueError('Cannot go up, out of bounds')
+                    # new player location based on up command
+                    newYLocation = initialYLocation + 1
+                    #setting the dictionaries value to the new changed location value
+                    self.players[name][1] = newYLocation
+                    #change the location of the player icon, by changing the . to a player name icon
+                    self.board[initialXLocation][newYLocation].description = name
+                    # since the player has gone over the old spot it can only be a '.' so we can change it back
+                    self.board[initialXLocation][initialYLocation].description = '.'
                 case 'd' | 'D':
-                    # move y coors down 1 -=1
+                    print('down')
+                # move y coors down 1 -=1
                 # throw valueError
-                    # if the y coord is at the edge so 0, then you cannot run that command
+                # if the y coord is at the edge so 0, then you cannot run that command
                 case 'l' | 'L':
-                    # move x coords down 1 -= 1
-                    # throw valueError
-                    # if the x coor is at the edge so 0, then you cannot run the command
+                    print('left')
+                # move x coords down 1 -= 1
+                # throw valueError
+                # if the x coor is at the edge so 0, then you cannot run the command
                 case 'r' | 'R':
-                    # move x coords up 1 += 1
+                    print('right')
+                # move x coords up 1 += 1
                 # throw valueError
                     # if the x coord is at the edge so 10, then you cannot run the coomand
                 case 'q' | 'Q':
-                    # exit the program
+                    exit()
                 case _:
                     print()
         except ValueError as details:
