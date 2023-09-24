@@ -6,7 +6,7 @@ newBoard = Board(5, 10, 5, 10, 2) # creating the new boar
 randPlayerXPos = random.randrange(0, 10) # creating initial random x and y coords
 randPlayerYPos = random.randrange(0, 10)
 playerNames = ["1", "2"] # list of players that will be added
-playerDirections = ['U', 'D', 'L', 'R', 'Q', 'u', 'd', 'l', 'r', 'q']
+playerDirections = ['U' , 'D' , 'L' , 'R' , 'Q', 'u' , 'd' , 'l' , 'r' , 'q']
 
 # goes over all the players in playerNames and looks at a random  x and y pos so it can add them, if that position is
 # not a "." then it will try again until it can, if the spot is taken it will let the player know
@@ -21,8 +21,6 @@ for player in playerNames:
             raise ValueError("space already occupied")
     newBoard.add_player(player, randPlayerXPos, randPlayerYPos)
 
-
-#
 while True:
     try:
         display(newBoard)

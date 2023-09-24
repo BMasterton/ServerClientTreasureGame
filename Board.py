@@ -33,7 +33,7 @@ class Board:
     }
 
     def add_player(self, name, xCord, yCord):
-       self.board[xCord][yCord].add_player(Player(name))
+       self.board[xCord][yCord].add_player(Player(name, 0))
        self.players[name] = [xCord, yCord]
     #    print(self.players[name])
        name = list(self.players.keys())[list(self.players.values()).index(self.players[name])]
@@ -64,6 +64,9 @@ class Board:
                         raise ValueError('Cant go out out bounds')
                     elif self.board[newXLocation][initialYLocation].player is not None:
                         raise Exception('Token already taken')
+                    elif self.board[newXLocation][initialYLocation].treasure is not None:
+                        self.board[newXLocation][initialYLocation].player.score += self.board[newXLocation][initialYLocation].treasure.value
+                        self.board[newXLocation][initialYLocation].treasure = None
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
                     self.players[name][0] = newXLocation
@@ -95,7 +98,7 @@ class Board:
                     initialYLocation = self.players[name][1]
                     newYLocation = initialYLocation -1
                     #checking if the user is out of bounds or if the spot is occupies by anything else
-                    if initialYLocation == 0:
+                    if initialYLocation == 0 :
                         raise ValueError('Cant go out out bounds')
                     elif self.board[initialXLocation][newYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
@@ -133,16 +136,6 @@ class Board:
             print(str(details))
         except Exception as details:
             print(str(details))
-
-
-        # need to have a if else nightmare with u d l r
-        # need to have a check for the sides of the map, if they are
-        # larger than 10 on the x and y and less than 1 on the x and y, you need to throw
-        # when moving player icon, it has to override the one its going too, and then rewrite the one it came from
-        # as a "." again
-        # a ValueError saying no, and dont do the move.
-
-
         return 0
 
 
