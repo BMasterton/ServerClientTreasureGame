@@ -12,6 +12,7 @@ class Board:
         self.min_val = min_val
         self.max_val = max_val
         self.board = [[Tile() for _ in range(n)] for _ in range(n)]
+        self.treasureCount = t
         if max_players < 0 or max_players > n:
             raise ValueError('Number must be above 0 and below n ')
         else:
@@ -64,20 +65,22 @@ class Board:
                         raise ValueError('Cant go out out bounds')
                     elif self.board[newXLocation][initialYLocation].player is not None:
                         raise Exception('Token already taken')
-                    elif self.board[newXLocation][initialYLocation].treasure is not None:
-                        self.board[newXLocation][initialYLocation].player.score += self.board[newXLocation][initialYLocation].treasure.value
-                        self.board[newXLocation][initialYLocation].treasure = None
-                        print(self.board[newXLocation][initialYLocation].player.score)
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
                     self.players[name][0] = newXLocation
                     #change the location of the player icon, by changing the . to a player name icon
-                    print( self.board[initialXLocation][initialYLocation].player.name)
-                    self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[newXLocation][initialYLocation].description = name
+                    self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[newXLocation][initialYLocation].player = self.board[initialXLocation][initialYLocation].player
+                    if self.board[newXLocation][initialYLocation].treasure is not None:
+                        self.board[newXLocation][initialYLocation].player.score += int(self.board[newXLocation][initialYLocation].treasure.value)
+                        print("player: ", name, "collected ", int(self.board[newXLocation][initialYLocation].treasure.value))
+                        self.treasureCount -=1
+                        self.board[newXLocation][initialYLocation].treasure = None
                     self.board[initialXLocation][initialYLocation].player = None
-                    print( self.board[newXLocation][initialYLocation].player.name)
+                    if self.treasureCount == 0:
+                        print("Player ", name, " collected a total of : ", self.board[newXLocation][initialYLocation].player.score, " points")
+                            
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'd' | 'D':
                     initialXLocation = self.players[name][0]
@@ -92,10 +95,13 @@ class Board:
                     #setting the dictionaries value to the new changed location value
                     self.players[name][0] = newXLocation
                     #change the location of the player icon, by changing the . to a player name icon
-                    print( self.board[initialXLocation][initialYLocation].player.name)
                     self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[newXLocation][initialYLocation].description = name
                     self.board[newXLocation][initialYLocation].player = self.board[initialXLocation][initialYLocation].player
+                    if self.board[newXLocation][initialYLocation].treasure is not None:
+                        self.board[newXLocation][initialYLocation].player.score += int(self.board[newXLocation][initialYLocation].treasure.value)
+                        print("player: ", name, "collected ", int(self.board[newXLocation][initialYLocation].treasure.value))
+                        self.board[newXLocation][initialYLocation].treasure = None
                     self.board[initialXLocation][initialYLocation].player = None
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'l' | 'L':
@@ -112,12 +118,14 @@ class Board:
                     #setting the dictionaries value to the new changed location value
                     self.players[name][1] = newYLocation
                     #change the location of the player icon, by changing the . to a player name icon
-                    print( self.board[initialXLocation][initialYLocation].player.name)
                     self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[initialXLocation][newYLocation].description = name
                     self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
+                    if self.board[initialXLocation][newYLocation].treasure is not None:
+                        self.board[initialXLocation][newYLocation].player.score += int(self.board[initialXLocation][newYLocation].treasure.value)
+                        print("player: ", name, "collected ", int(self.board[initialXLocation][newYLocation].treasure.value))
+                        self.board[initialXLocation][newYLocation].treasure = None
                     self.board[initialXLocation][initialYLocation].player = None
-                    print(self.board[initialXLocation][newYLocation].player.name)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'r' | 'R':
                     # current location of the active players x and y location
@@ -133,12 +141,14 @@ class Board:
                     #setting the dictionaries value to the new changed location value
                     self.players[name][1] = newYLocation
                     #change the location of the player icon, by changing the . to a player name icon
-                    print( self.board[initialXLocation][initialYLocation].player.name)
                     self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[initialXLocation][newYLocation].description = name
                     self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
+                    if self.board[initialXLocation][newYLocation].treasure is not None:
+                        self.board[initialXLocation][newYLocation].player.score += int(self.board[initialXLocation][newYLocation].treasure.value)
+                        print("player: ", name, "collected ", int(self.board[initialXLocation][newYLocation].treasure.value))
+                        self.board[initialXLocation][newYLocation].treasure = None
                     self.board[initialXLocation][initialYLocation].player = None
-                    print(self.board[initialXLocation][newYLocation].player)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'q' | 'Q':
                     exit()
