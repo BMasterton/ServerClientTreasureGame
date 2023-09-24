@@ -9,6 +9,8 @@ class Tile:
         self.player = player
 
     def __str__(self):
+        # basically if treasures doesnt equal non, then send treasure info, if player doesnt equal none 
+        # send player name, other wise always print out '.'
             if self.treasure:
                 return self.treasure.description
             elif self.player:
@@ -16,6 +18,7 @@ class Tile:
             else:
                 return self.description
 
+    #takes in a player and sets that player to the tile object 
     def add_player(self, player: Player):
         self.player = player
 
