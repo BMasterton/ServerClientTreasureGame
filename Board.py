@@ -67,13 +67,17 @@ class Board:
                     elif self.board[newXLocation][initialYLocation].treasure is not None:
                         self.board[newXLocation][initialYLocation].player.score += self.board[newXLocation][initialYLocation].treasure.value
                         self.board[newXLocation][initialYLocation].treasure = None
+                        print(self.board[newXLocation][initialYLocation].player.score)
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
                     self.players[name][0] = newXLocation
                     #change the location of the player icon, by changing the . to a player name icon
+                    print( self.board[initialXLocation][initialYLocation].player.name)
                     self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[newXLocation][initialYLocation].description = name
+                    self.board[newXLocation][initialYLocation].player = self.board[initialXLocation][initialYLocation].player
                     self.board[initialXLocation][initialYLocation].player = None
+                    print( self.board[newXLocation][initialYLocation].player.name)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'd' | 'D':
                     initialXLocation = self.players[name][0]
@@ -88,8 +92,10 @@ class Board:
                     #setting the dictionaries value to the new changed location value
                     self.players[name][0] = newXLocation
                     #change the location of the player icon, by changing the . to a player name icon
+                    print( self.board[initialXLocation][initialYLocation].player.name)
                     self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[newXLocation][initialYLocation].description = name
+                    self.board[newXLocation][initialYLocation].player = self.board[initialXLocation][initialYLocation].player
                     self.board[initialXLocation][initialYLocation].player = None
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'l' | 'L':
@@ -106,9 +112,12 @@ class Board:
                     #setting the dictionaries value to the new changed location value
                     self.players[name][1] = newYLocation
                     #change the location of the player icon, by changing the . to a player name icon
+                    print( self.board[initialXLocation][initialYLocation].player.name)
                     self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[initialXLocation][newYLocation].description = name
+                    self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
                     self.board[initialXLocation][initialYLocation].player = None
+                    print(self.board[initialXLocation][newYLocation].player.name)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'r' | 'R':
                     # current location of the active players x and y location
@@ -124,9 +133,12 @@ class Board:
                     #setting the dictionaries value to the new changed location value
                     self.players[name][1] = newYLocation
                     #change the location of the player icon, by changing the . to a player name icon
+                    print( self.board[initialXLocation][initialYLocation].player.name)
                     self.board[initialXLocation][initialYLocation].description = '.'
                     self.board[initialXLocation][newYLocation].description = name
+                    self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
                     self.board[initialXLocation][initialYLocation].player = None
+                    print(self.board[initialXLocation][newYLocation].player)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'q' | 'Q':
                     exit()
