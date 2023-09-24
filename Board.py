@@ -62,7 +62,7 @@ class Board:
                     #checking if the user is out of bounds or if the spot is occupies by anything else
                     if initialXLocation == 0 :
                         raise ValueError('Cant go out out bounds')
-                    elif self.board[newXLocation][initialYLocation].player != None:
+                    elif self.board[newXLocation][initialYLocation].player is not None:
                         raise Exception('Token already taken')
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
@@ -79,7 +79,7 @@ class Board:
                     #checking if the user is out of bounds or if the spot is occupies by anything else
                     if initialXLocation == 9 :
                         raise ValueError('Cant go out out bounds')
-                    elif self.board[newXLocation][initialYLocation].player != None:
+                    elif self.board[newXLocation][initialYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
@@ -95,9 +95,9 @@ class Board:
                     initialYLocation = self.players[name][1]
                     newYLocation = initialYLocation -1
                     #checking if the user is out of bounds or if the spot is occupies by anything else
-                    if initialYLocation == 0 :
+                    if initialYLocation == 0:
                         raise ValueError('Cant go out out bounds')
-                    elif self.board[initialXLocation][newYLocation].player != None:
+                    elif self.board[initialXLocation][newYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
@@ -115,7 +115,7 @@ class Board:
                     #checking if the user is out of bounds or if the spot is occupies by anything else
                     if initialYLocation == 9 :
                         raise ValueError('Cant go out out bounds')
-                    elif self.board[initialXLocation][newYLocation].player != None:
+                    elif self.board[initialXLocation][newYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
