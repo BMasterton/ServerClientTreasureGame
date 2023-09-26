@@ -14,20 +14,28 @@ class Board:
         self.board = [[Tile() for _ in range(n)] for _ in range(n)]
         self.treasureCount = t
         self.score = 0
-        if max_players < 0 or max_players > n:
+        if n < 2:
+            raise ValueError('n must not be less than 2')
+        if max_players <= 0 or max_players > n:
             raise ValueError('Number must be above 0 and below n ')
         else:
             self.max_players = max_players
+        if t < 1:
+            raise ValueError('Must have at least one treasure ')
+        if max_val < min_val:
+            raise ValueError('Max value must be higher than Min value')
+
+
         # this code below is to create 5 treasures, each treasure will be given
         # a random x and y variable for a spot in the 100 and then we take the board
         # object we created and add treasure to that coordinate by assigning it a treasure value
         for x in range(t):
-            randNumX = random.randrange(0, 10)
-            randNumY = random.randrange(0, 10)
+            randNumX = random.randrange(0, self.n)
+            randNumY = random.randrange(0, self.n)
             treasureValue = random.randrange(5, 10)
             while self.board[randNumX][randNumY].treasure: # if the space is already a treasure, find another spot
-                randNumX = random.randrange(0, 10)
-                randNumY = random.randrange(0, 10)
+                randNumX = random.randrange(0, self.n)
+                randNumY = random.randrange(0, self.n)
             self.board[randNumX][randNumY].treasure = Treasure(treasureValue)
     # as an example bob would be the key and the values would be the x and y coords
     players = {
@@ -57,7 +65,7 @@ class Board:
                     if initialXLocation == 0 :
                         raise ValueError('Cant go out out bounds')
                     elif self.board[newXLocation][initialYLocation].player is not None:
-                        raise Exception('Token already taken')
+                        raise Exception('Tile already occupied by player')
                     # new player location based on up command
                     #setting the dictionaries value to the new changed location value
                     self.players[name][0] = newXLocation
