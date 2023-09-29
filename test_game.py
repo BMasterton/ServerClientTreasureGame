@@ -50,6 +50,12 @@ def test_board():
     assert b1.board[9][9].player is not None
     b1.move_player(str(p2.name), 'R')
     with pytest.raises(Exception, match='Tile already occupied by player'):
-        b1.move_player(str(p2.name), 'R')
+        b1.move_player(str(p2.name), 'R') #not sure why not working
+
+    #directly add a treasure and collect it, should have a value apepar
+
+    #check the edges ad their errors
+
+    #check the tile class
 
 
