@@ -44,9 +44,73 @@ class Board:
     # adds / creates a player object to the board at a random coord, and sets the dictionary that 
     # holds name and coord info 
     def add_player(self, name, xCord, yCord):
-       self.board[xCord][yCord].add_player(Player(name, 0))
-       self.players[name] = [xCord, yCord]
+        self.board[xCord][yCord].add_player(Player(name, 0))
+        self.players[name] = [xCord, yCord]
 
+    def treasureCheck(self):
+        if self.treasureCount == 0:
+            for row in self.board:
+                for tile in row:
+                    if tile.get_player_from_current_tile() is not None:
+                        print("Player ", tile, " collected a total of: ", tile.player.score, " points")
+            exit(0) # ask about this
+    
+    #Takes in the new and old board locations, the name, and what direction and changes all values 
+    def change_tile_values(self, initialx, initialy, changesxory, name, positioning, direction):
+        #picking if its up or down direction
+        if positioning == 'vertical':
+            # up and down have different out of bounds exceptions
+            if direction == 'U':
+                if initialx == 0 :
+                    raise ValueError('Cant go out of bounds')
+                elif self.board[changesxory][initialy].get_player_from_current_tile() is not None: # change to another value 
+                    raise Exception('Tile already occupied by player')
+            elif direction == 'D':
+                if initialx == 9 :
+                    raise ValueError('Cant go out of bounds')
+                elif self.board[changesxory][initialy].get_player_from_current_tile() is not None: # change to another value 
+                    raise Exception('Tile already occupied by player')
+            self.players[name][0] = changesxory
+            # change new tile location to the correct name description
+            self.board[changesxory][initialy].set_description_to_name(name)
+            # set the old tile desc to the original '.'
+            self.board[initialx][initialy].set_description_to_original()
+            # moving the player object to the new tile from the old one 
+            self.board[changesxory][initialy].set_player_to_current_tile(self.board[initialx][initialy].get_player_from_current_tile())
+            # if there is a treasure in the tile they want to go too, give the player points, remove treasure
+            # print what they got, and decrement the treasure counter 
+            if self.board[changesxory][initialy].get_treasure() is not None:
+                self.board[changesxory][initialy].player.add_score(int(self.board[changesxory][initialy].treasure.get_treasure_value()))
+                print("Player ", name, " collected ", int(self.board[changesxory][initialy].treasure.get_treasure_value()), "points")
+                self.treasureCount -=1
+                self.board[changesxory][initialy].set_treasure_to_None()
+            # remove the player object from the initial location before move 
+            self.board[initialx][initialy].set_player_to_None()
+        # picking a left and right direction
+        elif positioning == 'horizontal':
+            if direction == 'L':
+                if initialy == 0 :
+                    raise ValueError('Cant go out of bounds')
+                elif self.board[initialx][changesxory].get_player_from_current_tile() is not None:
+                    raise Exception('Tile already occupied by player')
+            elif direction == 'R':
+                if initialy == 9 :
+                    raise ValueError('Cant go out of bounds')
+                elif self.board[initialx][changesxory].get_player_from_current_tile() is not None:
+                    raise Exception('Tile already occupied by player')
+            self.players[name][1] = changesxory
+            #change the location of the player icon, by changing the . to a player name icon
+            self.board[initialx][initialy].set_description_to_original()
+            self.board[initialx][changesxory].set_description_to_name(name) 
+            self.board[initialx][changesxory].set_player_to_current_tile(self.board[initialx][initialy].player)
+            if self.board[initialx][changesxory].get_treasure() is not None:
+                self.board[initialx][changesxory].player.add_score(int(self.board[initialx][changesxory].treasure.get_treasure_value()))
+                print("Player ", name, " collected ", int(self.board[initialx][changesxory].treasure.get_treasure_value()))
+                self.treasureCount -=1
+                self.board[initialx][changesxory].set_treasure_to_None()
+            self.board[initialx][initialy].set_player_to_None()
+            
+            
     # move the player and check what is in the place they are moving, sets a bunch of values based on 
     # if the tile is a player or treasure 
     def move_player(self, name, direction):
@@ -56,133 +120,39 @@ class Board:
         try:
             match direction:
                 case 'u' | 'U':
+                    positioning = 'vertical'
+                    direction = 'U'
                     #grab initial player location
                     initialXLocation = self.players[name][0]
                     initialYLocation = self.players[name][1]
                     #new location value based on direction picked
                     newXLocation = initialXLocation -1
-                    #checking if the user is out of bounds or if the spot is occupied by a player
-                    if initialXLocation == 0 :
-                        raise ValueError('Cant go out of bounds')
-                    elif self.board[newXLocation][initialYLocation].player is not None:
-                        raise Exception('Tile already occupied by player')
-                    # new player location based on up command
-                    #setting the dictionaries value to the new changed location value
-                    self.players[name][0] = newXLocation
-                    # change new tile location to the correct name description
-                    self.board[newXLocation][initialYLocation].description = name
-                    # set the old tile desc to the original '.'
-                    self.board[initialXLocation][initialYLocation].description = '.'
-                    # moving the player object to the new tile from the old one 
-                    self.board[newXLocation][initialYLocation].player = self.board[initialXLocation][initialYLocation].player
-                    # if there is a treasure in the tile they want to go too, give the player points, remove treasure
-                    # print what they got, and decrement the treasure counter 
-                    if self.board[newXLocation][initialYLocation].treasure is not None:
-                        self.board[newXLocation][initialYLocation].player.score += int(self.board[newXLocation][initialYLocation].treasure.value)
-                        print("Player ", name, " collected ", int(self.board[newXLocation][initialYLocation].treasure.value), "points")
-                        self.treasureCount -=1
-                        self.board[newXLocation][initialYLocation].treasure = None
-                    # remove the player object from the initial location before move 
-                    self.board[initialXLocation][initialYLocation].player = None
-                    #Check so that if there are no treasures left we look through all the tiles to find the locations of the 
-                    #players and print out their totals, then ends program
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
-                            
-                    # since the player has gone over the old spot it can only be a '.' so we can change it back
+                    self.change_tile_values(initialXLocation, initialYLocation, newXLocation, name, positioning, direction) 
+                    self.treasureCheck()
                 case 'd' | 'D':
+                    positioning = 'vertical'
+                    direction ='D'
                     initialXLocation = self.players[name][0]
                     initialYLocation = self.players[name][1]
                     newXLocation = initialXLocation +1
-                    #checking if the user is out of bounds or if the spot is occupies by anything else
-                    if initialXLocation == 9 :
-                        raise ValueError('Cant go out of bounds')
-                    elif self.board[newXLocation][initialYLocation].player is not None:
-                        raise Exception('Tile already occupied by player')
-                    # new player location based on up command
-                    #setting the dictionaries value to the new changed location value
-                    self.players[name][0] = newXLocation
-                    #change the location of the player icon, by changing the . to a player name icon
-                    self.board[initialXLocation][initialYLocation].description = '.'
-                    self.board[newXLocation][initialYLocation].description = name
-                    self.board[newXLocation][initialYLocation].player = self.board[initialXLocation][initialYLocation].player
-                    if self.board[newXLocation][initialYLocation].treasure is not None:
-                        self.board[newXLocation][initialYLocation].player.score += int(self.board[newXLocation][initialYLocation].treasure.value)
-                        print("Player ", name, " collected ", int(self.board[newXLocation][initialYLocation].treasure.value))
-                        self.treasureCount -=1
-                        self.board[newXLocation][initialYLocation].treasure = None
-                    self.board[initialXLocation][initialYLocation].player = None
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
-                    # since the player has gone over the old spot it can only be a '.' so we can change it back
+                    self.change_tile_values(initialXLocation, initialYLocation, newXLocation, name, positioning, direction)
+                    self.treasureCheck()
                 case 'l' | 'L':
-                    # current location of the active players x and y location
+                    positioning = 'horizontal'
+                    direction = 'L'
                     initialXLocation = self.players[name][0]
                     initialYLocation = self.players[name][1]
                     newYLocation = initialYLocation -1
-                    #checking if the user is out of bounds or if the spot is occupies by anything else
-                    if initialYLocation == 0 :
-                        raise ValueError('Cant go out of bounds')
-                    elif self.board[initialXLocation][newYLocation].player is not None:
-                        raise Exception('Tile already occupied by player')
-                    # new player location based on up command
-                    #setting the dictionaries value to the new changed location value
-                    self.players[name][1] = newYLocation
-                    #change the location of the player icon, by changing the . to a player name icon
-                    self.board[initialXLocation][initialYLocation].description = '.'
-                    self.board[initialXLocation][newYLocation].description = name
-                    self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
-                    if self.board[initialXLocation][newYLocation].treasure is not None:
-                        self.board[initialXLocation][newYLocation].player.score += int(self.board[initialXLocation][newYLocation].treasure.value)
-                        print("Player ", name, " collected ", int(self.board[initialXLocation][newYLocation].treasure.value))
-                        self.treasureCount -=1
-                        self.board[initialXLocation][newYLocation].treasure = None
-                    self.board[initialXLocation][initialYLocation].player = None
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
-                    # since the player has gone over the old spot it can only be a '.' so we can change it back
+                    self.change_tile_values(initialXLocation,initialYLocation, newYLocation, name, positioning, direction)
+                    self.treasureCheck()
                 case 'r' | 'R':
-                    # current location of the active players x and y location
+                    positioning = 'horizontal'
+                    direction = 'R'
                     initialXLocation = self.players[name][0]
                     initialYLocation = self.players[name][1]
                     newYLocation = initialYLocation + 1
-                    #checking if the user is out of bounds or if the spot is occupies by anything else
-                    if initialYLocation == 9 :
-                        raise ValueError('Cant go out of bounds')
-                    elif self.board[initialXLocation][newYLocation].player is not None:
-                        raise Exception('Tile already occupied by player')
-                    # new player location based on up command
-                    #setting the dictionaries value to the new changed location value
-                    self.players[name][1] = newYLocation
-                    #change the location of the player icon, by changing the . to a player name icon
-                    self.board[initialXLocation][initialYLocation].description = '.'
-                    self.board[initialXLocation][newYLocation].description = name
-                    self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
-                    if self.board[initialXLocation][newYLocation].treasure is not None:
-                        self.board[initialXLocation][newYLocation].player.score += int(self.board[initialXLocation][newYLocation].treasure.value)
-                        print("Player ", name, " collected ", int(self.board[initialXLocation][newYLocation].treasure.value))
-                        self.treasureCount -=1
-                        self.board[initialXLocation][newYLocation].treasure = None
-                    self.board[initialXLocation][initialYLocation].player = None
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
-                    # since the player has gone over the old spot it can only be a '.' so we can change it back
+                    self.change_tile_values(initialXLocation,initialYLocation, newYLocation, name, positioning, direction)
+                    self.treasureCheck()
                 case 'q' | 'Q':
                     exit()
                 case _:

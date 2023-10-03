@@ -1,8 +1,9 @@
 from View import display
 from Board import Board
+from Tile import Tile
 import random
 
-newBoard = Board(2, 10, 5, 10, 2) # creating the new boar
+newBoard = Board(3, 10, 5, 10, 2) # creating the new boar
 randPlayerXPos = random.randrange(0, 10) # creating initial random x and y coords
 randPlayerYPos = random.randrange(0, 10)
 playerNames = ["1", "2"] # list of players that will be added
@@ -14,8 +15,8 @@ for player in playerNames:
     randPlayerXPos = random.randrange(0, 10)
     randPlayerYPos = random.randrange(0, 10)
     # making sure that if the tile already has a player or a treaure, another player cant spawn on them
-    while newBoard.board[randPlayerXPos][randPlayerYPos].treasure is not None:
-        if newBoard.board[randPlayerXPos][randPlayerYPos].player is not None:
+    while newBoard.board[randPlayerXPos][randPlayerYPos].get_treasure() is not None:
+        if newBoard.board[randPlayerXPos][randPlayerYPos].get_player_from_current_tile() is not None:
             randPlayerXPos = random.randrange(0, 10)
             randPlayerYPos = random.randrange(0, 10)
             raise ValueError("space already occupied")

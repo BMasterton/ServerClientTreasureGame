@@ -15,14 +15,31 @@ def test_treasure():
     assert t1.description == '$'
     assert t2.value == 20
     assert t2.description == '%'
+    assert t1.get_treasure_value() == 10
+    assert t2.get_treasure_value() == 20
+
 
 def test_tile():
     t1 = Tile()
     t2 = Tile()
-
+    p1 = Player('bob')
+    name = 'tim'
     assert t1.description == '.'
     assert t1.player is None
     assert t1.treasure is None
+    tr = Treasure(10)
+    t2.add_player(p1)
+    assert t2.get_player_from_current_tile() == p1
+    t2.set_player_to_None()
+    assert t2.get_player_from_current_tile() is None
+    t2.set_treasure(tr)
+    assert t2.get_treasure() == tr
+    t2.set_treasure_to_None()
+    assert t2.get_treasure() is None
+    t2.set_description_to_name('tim')
+    assert t2.get_description() == 'tim'
+    t2.set_description_to_original()
+    assert t2.get_description() == '.'
 
 
 def test_player():
@@ -33,6 +50,9 @@ def test_player():
     assert p1.score == 0
     assert p2.name == 'tom'
     assert p2.score == 50
+
+    p2.add_score(50)
+    assert p2.get_score() == 100
 
 
 def test_board():
@@ -54,21 +74,21 @@ def test_board_players_movement():
             tile.treasure = None
     p1 = Player('1')
     p2 = Player('2')
-    b1.board[0][0].treasure = Treasure(5)
+    b1.board[0][0].set_treasure( Treasure(5))
     b1.add_player(str(p1.name), 9, 9)
     b1.add_player(str(p2.name), 9, 7)
     b1.move_player(str(p1.name), 'U')
-    assert b1.board[8][9].player is not None
+    assert b1.board[8][9].get_player_from_current_tile() is not None
     b1.move_player(str(p1.name), 'D')
-    assert b1.board[9][9].player is not None
+    assert b1.board[9][9].get_player_from_current_tile() is not None
     b1.move_player(str(p1.name), 'L')
-    assert b1.board[9][8].player is not None
+    assert b1.board[9][8].get_player_from_current_tile() is not None
     b1.move_player(str(p1.name), 'R')
-    assert b1.board[9][9].player is not None
+    assert b1.board[9][9].get_player_from_current_tile() is not None
     b1.move_player(str(p2.name), 'R')
-    assert b1.board[9][8].player is not None
+    assert b1.board[9][8].get_player_from_current_tile() is not None
     b1.move_player(str(p2.name), 'R')
-    assert b1.board[9][7].player is None
+    assert b1.board[9][7].get_player_from_current_tile() is None
 
 
 def test_board_players_score():
@@ -85,23 +105,23 @@ def test_board_players_score():
     b2.add_player(str(p1.name), 0, 1)
     b2.add_player(str(p2.name), 9, 8)
     b2.move_player(str(p1.name), 'L')
-    assert b2.board[0][0].player.score is 5
+    assert b2.board[0][0].player.get_score() is 5
     # captured = capsys.readouterr()
     # assert captured.out == "Player 1 collected 5"
-    assert b2.board[9][8].player is not None
-    assert b2.board[9][9].treasure is not None
+    assert b2.board[9][8].get_player_from_current_tile() is not None
+    assert b2.board[9][9].get_treasure() is not None
     b2.move_player(str(p2.name), 'R')
-    assert b2.board[9][9].treasure is None
-    assert b2.board[9][9].player.score is 10
+    assert b2.board[9][9].get_treasure() is None
+    assert b2.board[9][9].player.get_score() is 10
     # making sure that the score sum is working
-    b2.board[9][7].treasure = Treasure(10)
-    b2.board[9][6].treasure = Treasure(10)
-    assert b2.board[9][7].treasure is not None
-    assert b2.board[9][6].treasure is not None
+    b2.board[9][7].set_treasure(Treasure(10))
+    b2.board[9][6].set_treasure(Treasure(10))
+    assert b2.board[9][7].get_treasure() is not None
+    assert b2.board[9][6].get_treasure() is not None
     b2.move_player(str(p2.name), 'L')
     b2.move_player(str(p2.name), 'L')
-    assert b2.board[9][7].treasure is None
-    assert b2.board[9][7].player.score is 20
+    assert b2.board[9][7].get_treasure() is None
+    assert b2.board[9][7].player.get_score() is 20
     # check the total score at the end with
     # b2.move_player(str(p2.name), 'L')
     # assert b2.board[9][6].player.score is 30
@@ -116,8 +136,8 @@ def test_board_out_of_bounds():
     p1 = Player('1')
     p2 = Player('2')
 
-    b3.board[5][5].treasure = Treasure(5)
-    b3.board[6][6].treasure = Treasure(10)
+    b3.board[5][5].set_treasure(Treasure(5))
+    b3.board[6][6].set_treasure(Treasure(10))
 
     b3.add_player(str(p1.name), 0, 0)
     b3.add_player(str(p2.name), 9, 9)
@@ -140,14 +160,14 @@ def test_board_player_collission():
     b4.add_player(str(p1.name), 9, 9)
     b4.add_player(str(p2.name), 9, 8)
 
-    b4.board[5][5].treasure = Treasure(5)
-    b4.board[6][6].treasure = Treasure(10)
+    b4.board[5][5].set_treasure(Treasure(5))
+    b4.board[6][6].set_treasure(Treasure(10))
     # hold over as the Tile already occupied by player isnt recognizing the exception being raised
-    assert b4.board[9][8].player is not None
-    assert b4.board[9][9].player is not None
+    assert b4.board[9][8].get_player_from_current_tile() is not None
+    assert b4.board[9][9].get_player_from_current_tile() is not None
     b4.move_player(str(p2.name), 'R')
-    assert b4.board[9][8].player is not None
-    assert b4.board[9][9].player is not None
+    assert b4.board[9][8].get_player_from_current_tile() is not None
+    assert b4.board[9][9].get_player_from_current_tile() is not None
     # with pytest.raises(Exception, match='Tile already occupied by player'):
     #     b1.move_player(str(p2.name), 'R') #not sure why not working
 
