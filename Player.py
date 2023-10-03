@@ -5,5 +5,8 @@ class Player:
         self.score = score
 
     def add_score(self, score: int):
-            self.score += score
+        self.score += score
+
+    def get_score(self):
+        return self.score
     

@@ -43,3 +43,9 @@ class Tile:
     def get_treasure(self):
         return self.treasure
 
+    def set_treasure(self, treasure: Treasure):
+        self.treasure = treasure
+
+    def get_description(self):
+        return self.description
+
