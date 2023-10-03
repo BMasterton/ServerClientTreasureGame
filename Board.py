@@ -78,7 +78,10 @@ class Board:
                     # if there is a treasure in the tile they want to go too, give the player points, remove treasure
                     # print what they got, and decrement the treasure counter 
                     if self.board[newXLocation][initialYLocation].treasure is not None:
-                        self.board[newXLocation][initialYLocation].player.score += int(self.board[newXLocation][initialYLocation].treasure.value)
+                        # ------------------------------------------TESTING THIS -------------------------------------
+                        self.board[newXLocation][initialYLocation].player.add_score(int(self.board[newXLocation][initialYLocation].treasure.value))
+
+                        # self.board[newXLocation][initialYLocation].player.score += int(self.board[newXLocation][initialYLocation].treasure.value)
                         print("Player ", name, " collected ", int(self.board[newXLocation][initialYLocation].treasure.value), "points")
                         self.treasureCount -=1
                         self.board[newXLocation][initialYLocation].treasure = None
@@ -91,7 +94,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
+                        exit(0)
                             
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'd' | 'D':
@@ -111,7 +114,8 @@ class Board:
                     self.board[newXLocation][initialYLocation].description = name
                     self.board[newXLocation][initialYLocation].player = self.board[initialXLocation][initialYLocation].player
                     if self.board[newXLocation][initialYLocation].treasure is not None:
-                        self.board[newXLocation][initialYLocation].player.score += int(self.board[newXLocation][initialYLocation].treasure.value)
+                        # ------------------------------------------TESTING THIS -------------------------------------
+                        self.board[newXLocation][initialYLocation].player.add_score(int(self.board[newXLocation][initialYLocation].treasure.value))
                         print("Player ", name, " collected ", int(self.board[newXLocation][initialYLocation].treasure.value))
                         self.treasureCount -=1
                         self.board[newXLocation][initialYLocation].treasure = None
@@ -121,7 +125,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
+                        exit(0)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'l' | 'L':
                     # current location of the active players x and y location
@@ -141,7 +145,8 @@ class Board:
                     self.board[initialXLocation][newYLocation].description = name
                     self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
                     if self.board[initialXLocation][newYLocation].treasure is not None:
-                        self.board[initialXLocation][newYLocation].player.score += int(self.board[initialXLocation][newYLocation].treasure.value)
+                        # ------------------------------------------TESTING THIS -------------------------------------
+                        self.board[initialXLocation][newYLocation].player.add_score(int(self.board[initialXLocation][newYLocation].treasure.value))
                         print("Player ", name, " collected ", int(self.board[initialXLocation][newYLocation].treasure.value))
                         self.treasureCount -=1
                         self.board[initialXLocation][newYLocation].treasure = None
@@ -151,7 +156,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
+                        exit(0)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'r' | 'R':
                     # current location of the active players x and y location
@@ -171,7 +176,8 @@ class Board:
                     self.board[initialXLocation][newYLocation].description = name
                     self.board[initialXLocation][newYLocation].player = self.board[initialXLocation][initialYLocation].player
                     if self.board[initialXLocation][newYLocation].treasure is not None:
-                        self.board[initialXLocation][newYLocation].player.score += int(self.board[initialXLocation][newYLocation].treasure.value)
+                        # ------------------------------------------TESTING THIS -------------------------------------
+                        self.board[initialXLocation][newYLocation].player.add_score(int(self.board[initialXLocation][newYLocation].treasure.value))
                         print("Player ", name, " collected ", int(self.board[initialXLocation][newYLocation].treasure.value))
                         self.treasureCount -=1
                         self.board[initialXLocation][newYLocation].treasure = None
@@ -181,7 +187,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        quit()
+                        exit(0)
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'q' | 'Q':
                     exit()
