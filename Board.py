@@ -47,6 +47,15 @@ class Board:
        self.board[xCord][yCord].add_player(Player(name, 0))
        self.players[name] = [xCord, yCord]
 
+    def treasureCheck(self):
+        if self.treasureCount == 0:
+            for row in self.board:
+                for tile in row:
+                    if tile.player is not None:
+                        print("Player ", tile, " collected a total of: ", tile.player.score, " points")
+            exit(0)
+    
+
     # move the player and check what is in the place they are moving, sets a bunch of values based on 
     # if the tile is a player or treasure 
     def move_player(self, name, direction):
@@ -89,12 +98,7 @@ class Board:
                     self.board[initialXLocation][initialYLocation].player = None
                     #Check so that if there are no treasures left we look through all the tiles to find the locations of the 
                     #players and print out their totals, then ends program
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit(0)
+                    self.treasureCheck()
                             
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'd' | 'D':
@@ -120,12 +124,7 @@ class Board:
                         self.treasureCount -=1
                         self.board[newXLocation][initialYLocation].treasure = None
                     self.board[initialXLocation][initialYLocation].player = None
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit(0)
+                    self.treasureCheck()
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'l' | 'L':
                     # current location of the active players x and y location
@@ -151,12 +150,7 @@ class Board:
                         self.treasureCount -=1
                         self.board[initialXLocation][newYLocation].treasure = None
                     self.board[initialXLocation][initialYLocation].player = None
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit(0)
+                    self.treasureCheck()
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'r' | 'R':
                     # current location of the active players x and y location
@@ -182,12 +176,7 @@ class Board:
                         self.treasureCount -=1
                         self.board[initialXLocation][newYLocation].treasure = None
                     self.board[initialXLocation][initialYLocation].player = None
-                    if self.treasureCount == 0:
-                        for row in self.board:
-                            for tile in row:
-                                if tile.player is not None:
-                                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit(0)
+                    self.treasureCheck()
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'q' | 'Q':
                     exit()

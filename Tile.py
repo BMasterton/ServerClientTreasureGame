@@ -22,7 +22,20 @@ class Tile:
     def add_player(self, player: Player):
         self.player = player
 
-
+    def set_player_to_None(self):
+        self.player = None
+        
+    def set_treasure_to_none(self):
+        self.treasure = None
+        
+    def set_description_to_original(self):
+        self.description = '.'
+        
+    def set_description_to_name(self, name: str):
+        self.description = name
+        
+    def set_player_to_current_tile(self, player: Player):
+        self.player = player
 
 # string emthod where if treasure isnt None then you return the Treasure.description which isa $
 
