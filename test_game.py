@@ -105,14 +105,14 @@ def test_board_players_score(capsys):
         b2.add_player(str(p1.name), 0, 1)
         b2.add_player(str(p2.name), 9, 8)
         b2.move_player(str(p1.name), 'L')
-        assert b2.board[0][0].player.get_score() is 5
+        assert b2.board[0][0].player.get_score() == 5
         captured = capsys.readouterr()
         assert captured.out == "Player  1  collected  5\n"
         assert b2.board[9][8].get_player_from_current_tile() is not None
         assert b2.board[9][9].get_treasure() is not None
         b2.move_player(str(p2.name), 'R')
         assert b2.board[9][9].get_treasure() is None
-        assert b2.board[9][9].player.get_score() is 10
+        assert b2.board[9][9].player.get_score() == 10
         captured = capsys.readouterr()
         assert captured.out == "Player  2  collected  10\n"
         # making sure that the score sum is working
@@ -123,12 +123,12 @@ def test_board_players_score(capsys):
         b2.move_player(str(p2.name), 'L')
         b2.move_player(str(p2.name), 'L')
         assert b2.board[9][7].get_treasure() is None
-        assert b2.board[9][7].player.get_score() is 20
+        assert b2.board[9][7].player.get_score() == 20
         captured = capsys.readouterr()
         assert captured.out == "Player  2  collected  10\n"
         # check the total score at the end with
         b2.move_player(str(p2.name), 'L')
-        assert b2.board[9][6].player.score is 30
+        assert b2.board[9][6].player.score == 30
         captured = capsys.readouterr()
         assert captured.out == "Player  2  collected  10\n"
         captured = capsys.readouterr()
