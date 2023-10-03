@@ -2,7 +2,7 @@ from View import display
 from Board import Board
 import random
 
-newBoard = Board(1, 10, 5, 10, 2) # creating the new boar
+newBoard = Board(2, 10, 5, 10, 2) # creating the new boar
 randPlayerXPos = random.randrange(0, 10) # creating initial random x and y coords
 randPlayerYPos = random.randrange(0, 10)
 playerNames = ["1", "2"] # list of players that will be added

@@ -63,7 +63,7 @@ class Board:
                     newXLocation = initialXLocation -1
                     #checking if the user is out of bounds or if the spot is occupied by a player
                     if initialXLocation == 0 :
-                        raise ValueError('Cant go out out bounds')
+                        raise ValueError('Cant go out of bounds')
                     elif self.board[newXLocation][initialYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
                     # new player location based on up command
@@ -91,7 +91,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit()      
+                        quit()
                             
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'd' | 'D':
@@ -100,7 +100,7 @@ class Board:
                     newXLocation = initialXLocation +1
                     #checking if the user is out of bounds or if the spot is occupies by anything else
                     if initialXLocation == 9 :
-                        raise ValueError('Cant go out out bounds')
+                        raise ValueError('Cant go out of bounds')
                     elif self.board[newXLocation][initialYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
                     # new player location based on up command
@@ -121,7 +121,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit()  
+                        quit()
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'l' | 'L':
                     # current location of the active players x and y location
@@ -130,7 +130,7 @@ class Board:
                     newYLocation = initialYLocation -1
                     #checking if the user is out of bounds or if the spot is occupies by anything else
                     if initialYLocation == 0 :
-                        raise ValueError('Cant go out out bounds')
+                        raise ValueError('Cant go out of bounds')
                     elif self.board[initialXLocation][newYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
                     # new player location based on up command
@@ -151,7 +151,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit()  
+                        quit()
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'r' | 'R':
                     # current location of the active players x and y location
@@ -160,7 +160,7 @@ class Board:
                     newYLocation = initialYLocation + 1
                     #checking if the user is out of bounds or if the spot is occupies by anything else
                     if initialYLocation == 9 :
-                        raise ValueError('Cant go out out bounds')
+                        raise ValueError('Cant go out of bounds')
                     elif self.board[initialXLocation][newYLocation].player is not None:
                         raise Exception('Tile already occupied by player')
                     # new player location based on up command
@@ -181,7 +181,7 @@ class Board:
                             for tile in row:
                                 if tile.player is not None:
                                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-                        exit()  
+                        quit()
                     # since the player has gone over the old spot it can only be a '.' so we can change it back
                 case 'q' | 'Q':
                     exit()
