@@ -6,3 +6,6 @@ class Treasure:
 
     def __str__(self):
         return f'${self.value}'
+    
+    def get_treasure_value(self):
+        return self.value

@@ -25,7 +25,7 @@ class Tile:
     def set_player_to_None(self):
         self.player = None
         
-    def set_treasure_to_none(self):
+    def set_treasure_to_None(self):
         self.treasure = None
         
     def set_description_to_original(self):
@@ -36,6 +36,10 @@ class Tile:
         
     def set_player_to_current_tile(self, player: Player):
         self.player = player
-
-# string emthod where if treasure isnt None then you return the Treasure.description which isa $
+        
+    def get_player_from_current_tile(self):
+        return self.player
+    
+    def get_treasure(self):
+        return self.treasure
 
