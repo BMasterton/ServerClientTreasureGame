@@ -1,12 +1,11 @@
-import sys
+from sys import stderr
 import pytest
-
 from Treasure import Treasure
 from Board import Board
 from Player import Player
 from Tile import Tile
 
-
+# tests to make sure the treasure object is created, and that its functions work as expected
 def test_treasure():
     t1 = Treasure(10)
     t2 = Treasure(20, description='%')
@@ -18,7 +17,7 @@ def test_treasure():
     assert t1.get_treasure_value() == 10
     assert t2.get_treasure_value() == 20
 
-
+# test for the tile object, making sure all of its many functions work as anticipated
 def test_tile():
     t1 = Tile()
     t2 = Tile()
@@ -41,7 +40,7 @@ def test_tile():
     t2.set_description_to_original()
     assert t2.get_description() == '.'
 
-
+# testing the player object and making sure it forms properly and its functions work
 def test_player():
     p1 = Player('bob')
     p2 = Player('tom', 50)
@@ -54,7 +53,7 @@ def test_player():
     p2.add_score(50)
     assert p2.get_score() == 100
 
-
+# testing to make sure the board forms and that all errors are raised when not correctly made
 def test_board():
     with pytest.raises(ValueError, match='n must not be less than 2'):
         b = Board(1, 1, 5, 10, 5)
@@ -65,7 +64,7 @@ def test_board():
     with pytest.raises(ValueError, match='Max value must be higher than Min value'):
         b = Board(1, 5, 25, 5, 3)
 
-
+# testing to make sure players can correctly move aroud the board and all info is transferred
 def test_board_players_movement():
     b1 = Board(5, 10, 5, 10, 2)
     # just to make sure that I can determine where the treasures are to insure accuracy of tests
@@ -90,41 +89,53 @@ def test_board_players_movement():
     b1.move_player(str(p2.name), 'R')
     assert b1.board[9][7].get_player_from_current_tile() is None
 
+# testing to make sure the score functions and that the correct
+def test_board_players_score(capsys):
+    try:
+        b2 = Board(4, 10, 5, 10, 2)
+        # just to make sure that I can determine where the treasures are to insure accuracy of tests
+        for row in b2.board:
+            for tile in row:
+                tile.treasure = None
+        p1 = Player('1')
+        p2 = Player('2')
 
-def test_board_players_score():
-    b2 = Board(4, 10, 5, 10, 2)
-    # just to make sure that I can determine where the treasures are to insure accuracy of tests
-    for row in b2.board:
-        for tile in row:
-            tile.treasure = None
-    p1 = Player('1')
-    p2 = Player('2')
-
-    b2.board[0][0].treasure = Treasure(5)
-    b2.board[9][9].treasure = Treasure(10)
-    b2.add_player(str(p1.name), 0, 1)
-    b2.add_player(str(p2.name), 9, 8)
-    b2.move_player(str(p1.name), 'L')
-    assert b2.board[0][0].player.get_score() is 5
-    # captured = capsys.readouterr()
-    # assert captured.out == "Player 1 collected 5"
-    assert b2.board[9][8].get_player_from_current_tile() is not None
-    assert b2.board[9][9].get_treasure() is not None
-    b2.move_player(str(p2.name), 'R')
-    assert b2.board[9][9].get_treasure() is None
-    assert b2.board[9][9].player.get_score() is 10
-    # making sure that the score sum is working
-    b2.board[9][7].set_treasure(Treasure(10))
-    b2.board[9][6].set_treasure(Treasure(10))
-    assert b2.board[9][7].get_treasure() is not None
-    assert b2.board[9][6].get_treasure() is not None
-    b2.move_player(str(p2.name), 'L')
-    b2.move_player(str(p2.name), 'L')
-    assert b2.board[9][7].get_treasure() is None
-    assert b2.board[9][7].player.get_score() is 20
-    # check the total score at the end with
-    # b2.move_player(str(p2.name), 'L')
-    # assert b2.board[9][6].player.score is 30
+        b2.board[0][0].treasure = Treasure(5)
+        b2.board[9][9].treasure = Treasure(10)
+        b2.add_player(str(p1.name), 0, 1)
+        b2.add_player(str(p2.name), 9, 8)
+        b2.move_player(str(p1.name), 'L')
+        assert b2.board[0][0].player.get_score() is 5
+        captured = capsys.readouterr()
+        assert captured.out == "Player  1  collected  5\n"
+        assert b2.board[9][8].get_player_from_current_tile() is not None
+        assert b2.board[9][9].get_treasure() is not None
+        b2.move_player(str(p2.name), 'R')
+        assert b2.board[9][9].get_treasure() is None
+        assert b2.board[9][9].player.get_score() is 10
+        captured = capsys.readouterr()
+        assert captured.out == "Player  2  collected  10\n"
+        # making sure that the score sum is working
+        b2.board[9][7].set_treasure(Treasure(10))
+        b2.board[9][6].set_treasure(Treasure(10))
+        assert b2.board[9][7].get_treasure() is not None
+        assert b2.board[9][6].get_treasure() is not None
+        b2.move_player(str(p2.name), 'L')
+        b2.move_player(str(p2.name), 'L')
+        assert b2.board[9][7].get_treasure() is None
+        assert b2.board[9][7].player.get_score() is 20
+        captured = capsys.readouterr()
+        assert captured.out == "Player  2  collected  10\n"
+        # check the total score at the end with
+        b2.move_player(str(p2.name), 'L')
+        assert b2.board[9][6].player.score is 30
+        captured = capsys.readouterr()
+        assert captured.out == "Player  2  collected  10\n"
+        captured = capsys.readouterr()
+        assert captured.out == "Player  1  scored  5\n"
+        assert captured.out == "Player  1  scored  30\n"
+    except SystemExit:
+        pass
 
 
 def test_board_out_of_bounds():
@@ -169,9 +180,8 @@ def test_board_player_collission():
     assert b4.board[9][8].get_player_from_current_tile() is not None
     assert b4.board[9][9].get_player_from_current_tile() is not None
     # with pytest.raises(Exception, match='Tile already occupied by player'):
-    #     b1.move_player(str(p2.name), 'R') #not sure why not working
+    #     b4.move_player(str(p2.name), 'R') #not sure why not working
 
 
-    # check the tile class
 
 

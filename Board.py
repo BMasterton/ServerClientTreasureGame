@@ -2,6 +2,7 @@ from Treasure import Treasure
 from Tile import Tile
 from Player import Player
 import random
+import os
 
 
 # constructor for the board object
