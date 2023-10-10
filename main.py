@@ -44,6 +44,8 @@ while True:
                     print(data)
                     sc.sendall(data)  # Client IP and port implicit due to accept call
     # get value from user and make sure its an allowed input if not tell them and repeat until proper input
+                    # this will all need to change to send and recieve bit info from the server that we send with echo, and that data we decrypt will be then used to check the playerinputdirectiopn adn
+                    # playerinputname adn do all the checks and moves on etc
                     playerInputDirection = input("(U)p (D)own (L)eft (R)ight (Q)uit \n")
                     if playerInputDirection.upper() not in playerDirections:
                         raise Exception('Must give a valid direction or quit')
