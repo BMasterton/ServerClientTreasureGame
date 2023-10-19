@@ -55,6 +55,18 @@ class Board:
                     if tile.get_player_from_current_tile() is not None:
                         print("Player ", tile, " collected a total of: ", tile.player.score, " points")
             exit(0) # ask about this
+
+    def printScore(self):
+        for row in self.board:
+            for tile in row:
+                if tile.get_player_from_current_tile() is not None:
+                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
+
+    def printPlayerScore(self, name):
+        for row in self.board:
+            for tile in row:
+                if tile.get_player_from_current_tile() is not None and tile.get_player_from_current_tile().name == name:
+                    return tile.get_player_from_current_tile().get_score()
     
     #Takes in the new and old board locations, the name, and what direction and changes all values 
     def change_tile_values(self, initialx, initialy, changesxory, name, positioning, direction):
@@ -155,6 +167,7 @@ class Board:
                     self.change_tile_values(initialXLocation,initialYLocation, newYLocation, name, positioning, direction)
                     self.treasureCheck()
                 case 'q' | 'Q':
+                    self.printScore()
                     exit()
                 case _:
                     print()
