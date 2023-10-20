@@ -66,12 +66,12 @@ class Game:
                             elif first_four_only == playerDirectionDecimals[
                                 4]:  # when Q is received run send the scores of 1 and then 2 as shorts, send gameboard then itll run the quit command
                                 playerInputDirection = playerDirections[4]
-                                sc.sendall(struct.pack('!I', newBoard.printPlayerScore('1')))
-                                sc.sendall(struct.pack('!I', newBoard.printPlayerScore('2')))
+                                sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')) )
                                 sc.sendall(str(newBoard).encode())
                             elif first_four_only == playerDirectionDecimals[
                                 5]:  # when G is hit, print the scores, print the board, and then transmit the board
                                 newBoard.printScore()
+                                sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')) )
                                 display(newBoard)
                                 sc.sendall(str(newBoard).encode())
                             playerInputPlayer = str(middle_two_only)
