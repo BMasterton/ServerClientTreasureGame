@@ -12,7 +12,7 @@ class Game:
         pass
 
     def start(self):
-        newBoard = Board(3, 10, 5, 10, 2)  # creating the new boar
+        newBoard = Board(5, 10, 5, 10, 2)  # creating the new boar
         randPlayerXPos = random.randrange(0, 10)  # creating initial random x and y coords
         randPlayerYPos = random.randrange(0, 10)
         playerNames = ["1", "2"]  # list of players that will be added
@@ -29,11 +29,9 @@ class Game:
             randPlayerXPos = random.randrange(0, 10)
             randPlayerYPos = random.randrange(0, 10)
             # making sure that if the tile already has a player or a treaure, another player cant spawn on them
-            while newBoard.board[randPlayerXPos][randPlayerYPos].get_treasure() is not None:
-                if newBoard.board[randPlayerXPos][randPlayerYPos].get_player_from_current_tile() is not None:
-                    randPlayerXPos = random.randrange(0, 10)
-                    randPlayerYPos = random.randrange(0, 10)
-                    raise ValueError("space already occupied")
+            while newBoard.board[randPlayerXPos][randPlayerYPos].get_treasure() is not None or newBoard.board[randPlayerXPos][randPlayerYPos].get_player_from_current_tile() is not None:
+                randPlayerXPos = random.randrange(0, 10)
+                randPlayerYPos = random.randrange(0, 10)
             newBoard.add_player(player, randPlayerXPos, randPlayerYPos)
 
         while True:

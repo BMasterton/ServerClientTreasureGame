@@ -151,7 +151,7 @@ def get_scores(result: bytes) -> (int, int):
 
 
 def get_board() -> ([[str]], int, int):
-    result = put_data('F0')
+    result = put_data('F4')
     score1, score2 = get_scores(result)
     assert 0 <= score1 <= 100
     assert 0 <= score2 <= 100
