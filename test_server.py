@@ -215,6 +215,9 @@ def stroll_along(score1: int, score2: int, dir1: str, dir2: str, dir3: str) -> N
         direction = dir2 if direction == dir1 else dir1
 
     board, new_score1, new_score2 = get_board()
+    for row in board:
+        for col in row:
+            assert '$' not in col
     assert score1 < new_score1
     assert score2 == new_score2
 

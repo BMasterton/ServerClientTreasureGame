@@ -13,7 +13,7 @@ class Board:
         self.min_val = min_val
         self.max_val = max_val
         self.board = [[Tile() for _ in range(n)] for _ in range(n)]
-        self.treasureCount = t
+        self.treasureCount = t +1
         self.score = 0
         if n < 2:
             raise ValueError('n must not be less than 2')
@@ -49,7 +49,7 @@ class Board:
         self.players[name] = [xCord, yCord]
 
     def treasureCheck(self):
-        if self.treasureCount < 0:
+        if self.treasureCount == 0:
             for row in self.board:
                 for tile in row:
                     if tile.get_player_from_current_tile() is not None:
