@@ -34,7 +34,7 @@ class Board:
             randNumX = random.randrange(0, self.n)
             randNumY = random.randrange(0, self.n)
             treasureValue = random.randrange(5, 10)
-            while self.board[randNumX][randNumY].treasure: # if the space is already a treasure, find another spot
+            while self.board[randNumX][randNumY].get_treasure() is not None or self.board[randNumX][randNumY].get_player_from_current_tile() is not None: # if the space is already a treasure, find another spot
                 randNumX = random.randrange(0, self.n)
                 randNumY = random.randrange(0, self.n)
             self.board[randNumX][randNumY].treasure = Treasure(treasureValue)
@@ -49,14 +49,52 @@ class Board:
         self.players[name] = [xCord, yCord]
 
     def treasureCheck(self):
-        if self.treasureCount == 0:
+        if self.treasureCount < 0:
             for row in self.board:
                 for tile in row:
                     if tile.get_player_from_current_tile() is not None:
                         print("Player ", tile, " collected a total of: ", tile.player.score, " points")
-            exit(0) # ask about this
-    
-    #Takes in the new and old board locations, the name, and what direction and changes all values 
+            exit(0)
+
+    def printScore(self):
+        for row in self.board:
+            for tile in row:
+                if tile.get_player_from_current_tile() is not None:
+                    print("Player ", tile, " collected a total of: ", tile.player.score, " points")
+
+    def printPlayerScore(self, name):
+        for row in self.board:
+            for tile in row:
+                if tile.get_player_from_current_tile() is not None and tile.get_player_from_current_tile().name == name:
+                    return tile.get_player_from_current_tile().get_score()
+
+    def boardString(self):
+        boardView = ""
+        for row in self.board:
+            index = 0
+            for tile in row:
+                if tile.get_player_from_current_tile() is not None:
+                    if index != 9:
+                        boardView += tile.get_player_from_current_tile().name + ' '
+                        index += 1
+                    else:
+                        boardView += tile.get_player_from_current_tile().name
+                elif tile.get_treasure() is not None:
+                    if index != 9:
+                        boardView += tile.get_treasure().description + ' '
+                        index += 1
+                    else:
+                        boardView  += tile.get_treasure().description
+                else:
+                    if index != 9:
+                        boardView += tile.get_description() + ' '
+                        index += 1
+                    else:
+                        boardView += tile.get_description()
+            boardView += '\n'
+        return boardView
+
+    #Takes in the new and old board locations, the name, and what direction and changes all values
     def change_tile_values(self, initialx, initialy, changesxory, name, positioning, direction):
         #picking if its up or down direction
         if positioning == 'vertical':
@@ -83,9 +121,9 @@ class Board:
             if self.board[changesxory][initialy].get_treasure() is not None:
                 self.board[changesxory][initialy].player.add_score(int(self.board[changesxory][initialy].treasure.get_treasure_value()))
                 print("Player ", name, " collected ", int(self.board[changesxory][initialy].treasure.get_treasure_value()), "points")
-                self.treasureCount -=1
                 self.board[changesxory][initialy].set_treasure_to_None()
-            # remove the player object from the initial location before move 
+                self.treasureCount -=1
+            # remove the player object from the initial location before move
             self.board[initialx][initialy].set_player_to_None()
         # picking a left and right direction
         elif positioning == 'horizontal':
@@ -107,8 +145,8 @@ class Board:
             if self.board[initialx][changesxory].get_treasure() is not None:
                 self.board[initialx][changesxory].player.add_score(int(self.board[initialx][changesxory].treasure.get_treasure_value()))
                 print("Player ", name, " collected ", int(self.board[initialx][changesxory].treasure.get_treasure_value()))
-                self.treasureCount -=1
                 self.board[initialx][changesxory].set_treasure_to_None()
+                self.treasureCount -=1
             self.board[initialx][initialy].set_player_to_None()
             
             
@@ -155,6 +193,7 @@ class Board:
                     self.change_tile_values(initialXLocation,initialYLocation, newYLocation, name, positioning, direction)
                     self.treasureCheck()
                 case 'q' | 'Q':
+                    self.printScore()
                     exit()
                 case _:
                     print()
