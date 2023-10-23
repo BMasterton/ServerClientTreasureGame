@@ -67,8 +67,34 @@ class Board:
             for tile in row:
                 if tile.get_player_from_current_tile() is not None and tile.get_player_from_current_tile().name == name:
                     return tile.get_player_from_current_tile().get_score()
-    
-    #Takes in the new and old board locations, the name, and what direction and changes all values 
+
+    def boardString(self):
+        boardView = ""
+        for row in self.board:
+            index = 0
+            for tile in row:
+                if tile.get_player_from_current_tile() is not None:
+                    if index != 9:
+                        boardView += tile.get_player_from_current_tile().name + ' '
+                        index += 1
+                    else:
+                        boardView += tile.get_player_from_current_tile().name
+                elif tile.get_treasure() is not None:
+                    if index != 9:
+                        boardView += tile.get_treasure().description + ' '
+                        index += 1
+                    else:
+                        boardView += tile.get_treasure().description
+                else:
+                    if index != 9:
+                        boardView += tile.get_description() + ' '
+                        index += 1
+                    else:
+                        boardView += tile.get_description()
+            boardView += '\n'
+        return boardView
+
+    #Takes in the new and old board locations, the name, and what direction and changes all values
     def change_tile_values(self, initialx, initialy, changesxory, name, positioning, direction):
         #picking if its up or down direction
         if positioning == 'vertical':
