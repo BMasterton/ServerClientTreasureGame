@@ -60,12 +60,20 @@ class Game:
                             middle_two_only = middle_two_full >> 2
                             if first_four_only == playerDirectionDecimals[0]:
                                 playerInputDirection = playerDirections[0]
+                                sc.sendall(
+                                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
                             elif first_four_only == playerDirectionDecimals[1]:
                                 playerInputDirection = playerDirections[1]
+                                sc.sendall(
+                                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
                             elif first_four_only == playerDirectionDecimals[2]:
                                 playerInputDirection = playerDirections[2]
+                                sc.sendall(
+                                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
                             elif first_four_only == playerDirectionDecimals[3]:
                                 playerInputDirection = playerDirections[3]
+                                sc.sendall(
+                                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
                             elif first_four_only == playerDirectionDecimals[
                                 4]:  # when Q is received run send the scores of 1 and then 2 as shorts, send gameboard then itll run the quit command
                                 playerInputDirection = playerDirections[4]
@@ -76,15 +84,11 @@ class Game:
                                 newBoard.printScore()
                                 sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')) )
                                 display(newBoard)
-                                # encoded = str(newBoard).encode()
-
-                                # print(str(newBoard))
-                                # print(encoded.decode())
                                 sc.sendall(newBoard.boardString().encode('utf-8'))
                             playerInputPlayer = str(middle_two_only)
 
                             print('Data', data)
-                            sc.sendall(data)  # Client IP and port implicit due to accept call
+
                             if playerInputDirection not in playerDirections:
                                 raise Exception('Must give a valid direction or quit')
                             if playerInputPlayer not in playerNames:
