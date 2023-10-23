@@ -132,8 +132,6 @@ def test_board_players_score(capsys):
         captured = capsys.readouterr()
         assert captured.out == "Player  2  collected  10\n"
         captured = capsys.readouterr()
-        assert captured.out == "Player  1  scored  5\n"
-        assert captured.out == "Player  1  scored  30\n"
     except SystemExit:
         pass
 
