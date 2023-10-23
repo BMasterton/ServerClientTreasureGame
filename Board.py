@@ -34,7 +34,7 @@ class Board:
             randNumX = random.randrange(0, self.n)
             randNumY = random.randrange(0, self.n)
             treasureValue = random.randrange(5, 10)
-            while self.board[randNumX][randNumY].get_treasure() is not None or self.board[randNumX][randNumY].get_player_from_current_tile() is not None: # if the space is already a treasure, find another spot
+            while self.board[randNumX][randNumY].get_treasure() is not None: # if the space is already a treasure, find another spot
                 randNumX = random.randrange(0, self.n)
                 randNumY = random.randrange(0, self.n)
             self.board[randNumX][randNumY].treasure = Treasure(treasureValue)
