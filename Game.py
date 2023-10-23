@@ -13,8 +13,6 @@ class Game:
 
     def start(self):
         newBoard = Board(5, 10, 5, 10, 2)  # creating the new boar
-        randPlayerXPos = random.randrange(0, 10)  # creating initial random x and y coords
-        randPlayerYPos = random.randrange(0, 10)
         playerNames = ["1", "2"]  # list of players that will be added
         playerDirections = ['U', 'D', 'L', 'R', 'Q', 'G']
         playerDirectionDecimals = [2, 3, 4, 6, 8, 15]
@@ -36,10 +34,7 @@ class Game:
 
         while True:
             try:
-                # boardView = newBoard.boardString()
-                # print('board view string', boardView)
-                display(newBoard)
-
+                display(newBoard) #displays the original board
                 with socket(AF_INET, SOCK_STREAM) as sock:  # TCP socket
                     sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)  # Details later
                     sock.bind((HOST, PORT))  # Claim messages sent to port "PORT"
@@ -56,19 +51,19 @@ class Game:
                             first_four_only = first_four_full >> 4
                             middle_two_full = my_byte & 12
                             middle_two_only = middle_two_full >> 2
-                            if first_four_only == playerDirectionDecimals[0]:
+                            if first_four_only == playerDirectionDecimals[0]: # direcion Up
                                 playerInputDirection = playerDirections[0]
                                 sc.sendall(
                                     struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-                            elif first_four_only == playerDirectionDecimals[1]:
+                            elif first_four_only == playerDirectionDecimals[1]: # direction Down
                                 playerInputDirection = playerDirections[1]
                                 sc.sendall(
                                     struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-                            elif first_four_only == playerDirectionDecimals[2]:
+                            elif first_four_only == playerDirectionDecimals[2]: #direction Left
                                 playerInputDirection = playerDirections[2]
                                 sc.sendall(
                                     struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-                            elif first_four_only == playerDirectionDecimals[3]:
+                            elif first_four_only == playerDirectionDecimals[3]: #direction Right
                                 playerInputDirection = playerDirections[3]
                                 sc.sendall(
                                     struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
@@ -85,8 +80,9 @@ class Game:
                                 sc.sendall(newBoard.boardString().encode('utf-8'))
                             playerInputPlayer = str(middle_two_only)
 
-                            print('Data', data)
+                            print('Data', data) #printing the data we receive
 
+                            # making sure the directions and players are allowed choices or reject
                             if playerInputDirection not in playerDirections:
                                 raise Exception('Must give a valid direction or quit')
                             if playerInputPlayer not in playerNames:
