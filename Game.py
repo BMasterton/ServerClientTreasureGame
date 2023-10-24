@@ -10,15 +10,28 @@ playerDirections = ['U', 'D', 'L', 'R', 'Q', 'G']
 playerDirectionDecimals = [2, 3, 4, 6, 8, 15]
 BUF_SIZE = 1024
 lock =  Semaphore()
+playerCounter = 0
+
+
+def get_line(current_socket: socket) -> str:
+    buffer = b''
+    while True:
+        data = current_socket.recv(BUF_SIZE)
+        if data == b'' or data == b'\n':
+            return buffer
+        buffer = buffer + data
 
 def playerControl(sc, newBoard, playerNames):
-    # with lock:
+    global playerCounter
     with sc:
+        if playerCounter < 3:
+            playerCounter += 1
+        else:
+            print("Player limit reached")
+        sc.sendall(playerCounter)
         print('Client:', sc.getpeername())  # Client IP and port
-        # if clientCounter < 3:  # dunno maybe this is some way i can have a dictionary with name is player and value is the ip of the player ?
-        #     clientCounter += 1
-        #     connections[clientCounter] = sc.getpeername()  # find someway to get a connection and add it
-        data = sc.recv(BUF_SIZE)  # recvfrom not needed since address known
+        data = sc.recv(1)  # ust this to get info from client
+        #data3 = get_line(sc) # this should be the data we get from the client
         data2 = list(data)
         my_byte = data2[0]
         first_four_full = my_byte & 240
