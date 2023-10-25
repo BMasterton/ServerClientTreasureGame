@@ -13,25 +13,26 @@ if len(argv) != 2:
     print(argv[0] + ' <message>')
     exit()
 
-
+#when the server sends over the client id, for the rest of the connection the clinet will send back
+# every direction byte with the client number in bytes appended onto it. ie send should be like 00100100 still
 def main():
     with socket(AF_INET, SOCK_STREAM) as sock: # TCP socket
         sock.connect((HOST, PORT)) # Initiates 3-way handshake
         print('Client:', sock.getsockname()) # Client IP and port
         player_id_binary = sock.recv(2)
-        player_id_hex = struct.unpack('!H', player_id_binary)
-        print(player_id_hex)
+        play_id_int = struct.unpack('!H', player_id_binary)
+        print(play_id_int)
         # sock.sendall(data) # Server IP and port implicit due to connect call
-        reply = sock.recv(BUF_SIZE) # recvfrom not needed since address known
-        print('Reply:', reply)
+        #clientNumber = sock.recv(BUF_SIZE) # recvfrom not needed since address known
+        print('clientNumber:', play_id_int)
 
         while True:
-            try:
-                directionInput = input("please enter a direction")
-                if directionInput not in directionsString:
-                    raise Exception("Incorrect command entered, please try again")
-            except Exception as details:
-                print(str(details))
+            directionInput = input("please enter a direction")
+            if directionInput == directionsString[0]:
+                sendCommand = struct.pack("!H",directionsBytes[0]).join(play_id_int)
+                print(sendCommand)
+
+
         # this is all the input info where we repeatedly as for input and then send that as bytes but will need to change it from the letter you get to hex asci to binray or something
 
 

@@ -28,7 +28,8 @@ def playerControl(sc, newBoard, playerNames):
             playerCounter += 1
         else:
             print("Player limit reached")
-        sc.sendall(playerCounter)
+        sc.sendall(struct.pack("!H", playerCounter)) # so add if playerCoutner is 1 or two send the literal byte string
+        # sc.sendall(b'\x01')
         print('Client:', sc.getpeername())  # Client IP and port
         data = sc.recv(1)  # ust this to get info from client
         #data3 = get_line(sc) # this should be the data we get from the client
