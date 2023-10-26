@@ -12,34 +12,28 @@ BUF_SIZE = 1024
 lock =  Semaphore()
 playerCounter = 0
 
-
-def get_line(current_socket: socket) -> str:
-    buffer = b''
-    while True:
-        data = current_socket.recv(BUF_SIZE)
-        if data == b'' or data == b'\n':
-            return buffer
-        buffer = buffer + data
-
 def playerControl(sc, newBoard, playerNames):
     global playerCounter
     with sc:
-        if playerCounter < 3:
+        if playerCounter < 3: # setting player with playerCounter
             playerCounter += 1
+        if playerCounter == 1:
+            sc.sendall(b'\x01')
+        elif playerCounter == 2:
+            sc.sendall(b'\x10')
         else:
-            print("Player limit reached")
-        sc.sendall(struct.pack("!H", playerCounter)) # so add if playerCoutner is 1 or two send the literal byte string
-        # sc.sendall(b'\x01')
+            errorMessage = "2 players exist, closing connection"
+            sc.sendall(errorMessage.encode('utf-8'))
         print('Client:', sc.getpeername())  # Client IP and port
-        data = sc.recv(1)  # ust this to get info from client
-        #data3 = get_line(sc) # this should be the data we get from the client
+        data = sc.recv(1)  # us this to get info from client with 1 byte of info maybe make this BUD_SIZE
+        print('Data', data)
         data2 = list(data)
         my_byte = data2[0]
         first_four_full = my_byte & 240
         first_four_only = first_four_full >> 4
         middle_two_full = my_byte & 12
         middle_two_only = middle_two_full >> 2
-        if first_four_only == playerDirectionDecimals[0]:  # direcion Up
+        if first_four_only == playerDirectionDecimals[0]:  # direction Up
             playerInputDirection = playerDirections[0]
             sc.sendall(
                 struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
