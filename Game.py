@@ -24,8 +24,9 @@ def playerControl(sc, newBoard, playerNames):
         else:
             errorMessage = "2 players exist, closing connection"
             sc.sendall(errorMessage.encode('utf-8'))
+            sc.close()
         print('Client:', sc.getpeername())  # Client IP and port
-        data = sc.recv(1)  # us this to get info from client with 1 byte of info maybe make this BUD_SIZE
+        data = sc.recv(BUF_SIZE)  # us this to get info from client with 1 byte of info maybe make this BUD_SIZE
         print('Data', data)
         data2 = list(data)
         my_byte = data2[0]
