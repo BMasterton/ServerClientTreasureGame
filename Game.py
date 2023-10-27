@@ -15,13 +15,13 @@ playerCounter = 0
 def playerControl(sc, newBoard, playerNames):
     global playerCounter
     with sc:
-        if playerCounter < 3: # setting player with playerCounter
+        if playerCounter < 4: # setting player with playerCounter
             playerCounter += 1
         if playerCounter == 1:
             sc.sendall(b'\x01')
         elif playerCounter == 2:
             sc.sendall(b'\x10')
-        else:
+        elif playerCounter == 3:
             errorMessage = "2 players exist, closing connection"
             sc.sendall(errorMessage.encode('utf-8'))
             sc.close()
@@ -29,7 +29,9 @@ def playerControl(sc, newBoard, playerNames):
         data = sc.recv(BUF_SIZE)  # us this to get info from client with 1 byte of info maybe make this BUD_SIZE
         print('Data', data)
         data2 = list(data)
+        print('Data-2', data2)
         my_byte = data2[0]
+        print('MyByte',my_byte)
         first_four_full = my_byte & 240
         first_four_only = first_four_full >> 4
         middle_two_full = my_byte & 12

@@ -22,19 +22,18 @@ def main():
         print('Client:', sock.getsockname()) # Client IP and port
         player_id_binary = sock.recv(1) # getting info from the server for player id
         print(player_id_binary)
-        play_id_int = int(player_id_binary)
-        print(play_id_int)
-        # sock.sendall(data) # Server IP and port implicit due to connect call
-        print('clientNumber:', play_id_int)
+        # play_id_int = int(player_id_binary)
+        # print(play_id_int)
+        # # sock.sendall(data) # Server IP and port implicit due to connect call
+        # print('clientNumber:', play_id_int)
 
         while True:
-            directionInput = input("please enter a direction")
+            directionInput = input("please enter a direction ")
             if directionInput == directionsString[0]: #direction is U
-                #want to send
-                sendCommand = struct.pack("!H",directionsBytes[0]).join(player_id_binary).join(endBuffer)
-                print(sendCommand)
-                sock.sendall(sendCommand)
-                print(sendCommand)
+                byteString = directionsBytes[0] + player_id_binary + endBuffer # making a binary string of the command info
+                #sendCommand = struct.pack("!H",directionsBytes[0]).join(player_id_binary).join(endBuffer)
+                print('bytes', byteString)
+                sock.sendall(byteString)
             elif directionInput == directionsString[1]: #direction is D
                 sendCommand = struct.pack("!H",directionsBytes[1]).join(player_id_binary).join(endBuffer)
                 sock.sendall(sendCommand)
