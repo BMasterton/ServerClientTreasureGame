@@ -9,8 +9,9 @@ from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 playerDirections = ['U', 'D', 'L', 'R', 'Q', 'G']
 playerDirectionDecimals = [2, 3, 4, 6, 8, 15]
 BUF_SIZE = 1024
-lock =  Semaphore()
+lock = Semaphore()
 playerCounter = 0
+
 
 def playerControl(sc, newBoard, playerNames):
     global playerCounter
