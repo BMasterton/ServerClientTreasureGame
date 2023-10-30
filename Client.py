@@ -5,10 +5,10 @@ import struct
 BUF_SIZE = 1024
 HOST = '127.0.0.1'
 PORT = 12345
-directionsString = ['U', 'D', 'L', 'R', 'Q', 'G']
-playerDirectionString = ['2', '3', '4', '6', '8', 'F']
-directionsBytes = [b'\x0010', b'\x0011', b'\x0100', b'\x0110', b'\x1000', b'\x1111']
-HEADER_LEN = 2
+directionsString = ['U', 'D', 'L', 'R', 'Q', 'G'] #list of direction strings
+playerDirectionString = ['2', '3', '4', '6', '8', 'F'] # hex values of all directions
+directionsBytes = [b'\x0010', b'\x0011', b'\x0100', b'\x0110', b'\x1000', b'\x1111'] # byte values of all directions
+HEADER_LEN = 2 # header length will always be two as its just two bytes representing size
 
 # prints the scores from the incoming recV() function from server
 def printScores(data):
@@ -45,8 +45,8 @@ def playerInt(playerIntNumber):
     return playerIntNumber / 4
 
 
-#when the server sends over the client id, for the rest of the connection the clinet will send back
-# every direction byte with the client number in bytes appended onto it. ie send should be like 00100100 still
+# main function that gets the client number and connects to the server, will repeatedly ask for an input
+#send it over to the server and print out any retured info sent back from the client so the user can see whats going on
 def main():
     with socket(AF_INET, SOCK_STREAM) as sock: # TCP socket
         sock.connect((HOST, PORT)) # Initiates 3-way handsha
@@ -71,7 +71,7 @@ def main():
         player_int_number = int.from_bytes(bytes_from_server, byteorder='big')
         print('Player ID', player_int_number)
 
-        #player totallity checker
+        #player totallity checker closes client if a third is added
         if playerInt(int_from_server) > 2:
             print("too many clients closing the connection")
             return

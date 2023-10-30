@@ -6,12 +6,11 @@ from threading import Semaphore, Thread
 import random
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 
-playerDirections = ['U', 'D', 'L', 'R', 'Q', 'G']
-playerDirectionDecimals = [2, 3, 4, 6, 8, 15]
+playerDirections = ['U', 'D', 'L', 'R', 'Q', 'G'] # string version of all directions that can be picked
+playerDirectionDecimals = [2, 3, 4, 6, 8, 15] # the decimal value of all of the directions changes from binary
 BUF_SIZE = 1024
 lock = Semaphore()
-playerCounter = 0
-connections = {}
+playerCounter = 0 # keeps track of the connections
 
 #packs up all the points and headers for the points to send over to the client
 def pointPack(newBoard):
@@ -21,27 +20,30 @@ def pointPack(newBoard):
     scores_header = struct.pack('!H', scores_len)
     return scores_header + score1_bin + score2_bin
 
+#takes in a newboard and returns the packed version of the board with the header length prepended
 def boardPack(newBoard):
     payload = newBoard.boardString().encode('utf-8')
     payload_len = len(payload)
     payload_header = struct.pack('!H', payload_len)
     return payload_header + payload
 
+#takes in the byte string representing the player and returns the header length and player byte string
 def playerPack(data):
     data_length = struct.pack('!H', len(data))
     data_to_send = data_length + data
     return data_to_send
 
+# Main thread function that deals with all logic for the boards and players
 def playerControl(sc, newBoard, playerNames):
     global playerCounter
-    playerId=0
+    playerId=0 #unique connection variable
     with sc:
         if playerCounter < 4: # setting player with playerCounter
             playerCounter += 1
         if playerCounter == 1:
             #trying to somehow get each connections value
             playerId = 1
-            data = b'\x04'
+            data = b'\x04' # data representing player 1, transformed in the client to be an int
             sc.sendall(playerPack(data)) #sending player data to the client
         elif playerCounter == 2:
             playerId = 2
@@ -55,10 +57,9 @@ def playerControl(sc, newBoard, playerNames):
 
         while True:
             print('Client:', sc.getpeername())  # Client IP and port
-            data = sc.recv(BUF_SIZE)  # us this to get info from client with 1 byte of info maybe make this BUD_SIZE
+            data = sc.recv(BUF_SIZE) # Receives info from the client as directions
             data2 = list(data)
             my_byte = data2[0]
-            # becasue we only pass in the direction we no longer can get the player
             #this mask isnt working and its returning 0 instead of what it should
             first_four_full = my_byte & 15
             print('firstFourFull',first_four_full)
