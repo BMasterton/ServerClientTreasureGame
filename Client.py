@@ -24,6 +24,8 @@ def printBoard(board):
     print(board)
     return
 
+
+#wanted to get the dry data from the inputs in here but ran out of time
 def headerCheck( data):  # there will always be two initial bytes, which are the length header
     if len(data) != 2:
         raise Exception('Could not recieve Length of header!')
@@ -77,7 +79,7 @@ def main():
         while True:
             directionInput = input("please enter a direction: ")
             if directionInput == directionsString[0]: #direction is U
-                sock.sendall(directionsBytes[0] ) # sending the information back to the server
+                sock.sendall(directionsBytes[0]) # sending the information back to the server
                 data_length_bytes = sock.recv(HEADER_LEN) # getting the length of the server sent over data
                 if len(data_length_bytes) != 2:
                     raise Exception('Could not recieve Length of header!')
@@ -92,7 +94,7 @@ def main():
 
                 printScores(sock.recv( num_bytes)) # print out the scores with the socket of the size returned from the header
             elif directionInput == directionsString[1]: #direction is D
-                sock.sendall(bytes.fromhex(playerDirectionString[1] + str(player_int_number)))
+                sock.sendall(directionsBytes[1] )
                 data_length_bytes = sock.recv(HEADER_LEN)
                 print('datalengthbytesDirU', data_length_bytes)
                 if len(data_length_bytes) != 2:
@@ -112,7 +114,7 @@ def main():
 
                 printScores(sock.recv(num_bytes))
             elif directionInput == directionsString[2]: #direction is L
-                sock.sendall(bytes.fromhex(playerDirectionString[2] + str(player_int_number)))
+                sock.sendall(directionsBytes[2])
                 data_length_bytes = sock.recv(HEADER_LEN)
                 print('datalengthbytesDirU', data_length_bytes)
                 if len(data_length_bytes) != 2:
@@ -132,7 +134,7 @@ def main():
 
                 printScores(sock.recv(num_bytes))
             elif directionInput == directionsString[3]: # direction is R
-                sock.sendall(bytes.fromhex(playerDirectionString[3] + str(player_int_number)))
+                sock.sendall(directionsBytes[3])
                 data_length_bytes = sock.recv(HEADER_LEN)
                 print('datalengthbytesDirU', data_length_bytes)
                 if len(data_length_bytes) != 2:
@@ -153,7 +155,7 @@ def main():
                 printScores(sock.recv(num_bytes))
             elif directionInput == directionsString[4]: # direction is Q
                 # send info to server, print scores and board, quit
-                sock.sendall(bytes.fromhex(playerDirectionString[4] + str(player_int_number)))
+                sock.sendall(directionsBytes[4])
                 data_length_bytes = sock.recv(HEADER_LEN)
                 print('datalengthbytesDirU', data_length_bytes)
                 if len(data_length_bytes) != 2:
@@ -176,7 +178,7 @@ def main():
                 return
             elif directionInput == directionsString[5]: # direction is G
                 # send info to sever, then print the returned scores and board
-                sock.sendall(bytes.fromhex(playerDirectionString[5] + str(player_int_number)))
+                sock.sendall(directionsBytes[5])
                 printScores(sock.recv(BUF_SIZE))
                 printBoard(sock.recv(BUF_SIZE))
 

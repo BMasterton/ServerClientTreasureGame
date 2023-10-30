@@ -59,7 +59,9 @@ def playerControl(sc, newBoard, playerNames):
             data2 = list(data)
             my_byte = data2[0]
             # becasue we only pass in the direction we no longer can get the player
+            #this mask isnt working and its returning 0 instead of what it should
             first_four_full = my_byte & 15
+            print('firstFourFull',first_four_full)
             if first_four_full == playerDirectionDecimals[0]:  # direction Up
                 playerInputDirection = playerDirections[0]
                 sc.sendall(pointPack(newBoard))
