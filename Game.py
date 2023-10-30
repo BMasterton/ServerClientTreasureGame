@@ -16,7 +16,6 @@ playerCounter = 0
 def playerControl(sc, newBoard, playerNames):
     global playerCounter
     with sc:
-        #probably need something better here
         if playerCounter < 4: # setting player with playerCounter
             playerCounter += 1
         if playerCounter == 1:
@@ -24,7 +23,6 @@ def playerControl(sc, newBoard, playerNames):
         elif playerCounter == 2:
             sc.sendall(b'\x08')
         elif playerCounter == 3:
-
             sc.sendall(b'\x12')
             sc.close()
 
@@ -38,13 +36,13 @@ def playerControl(sc, newBoard, playerNames):
             print('MyByte',my_byte)
             first_four_full = my_byte & 240
             first_four_only = first_four_full >> 4
+            print(first_four_only)
             middle_two_full = my_byte & 12
             middle_two_only = middle_two_full >> 2
             if first_four_only == playerDirectionDecimals[0]:  # direction Up
-                playerInputDirection = playerDirections[0]
+                playerInputDirection = playerDirections[0] # setting playerInputDirection so the program knows its one of the allowed inputs
                 sc.sendall(
-                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-                sc.sendall(newBoard.boardString().encode('utf-8'))
+                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2'))) # sending the two scores in one stuct
             elif first_four_only == playerDirectionDecimals[1]:  # direction Down
                 playerInputDirection = playerDirections[1]
                 sc.sendall(
@@ -62,9 +60,10 @@ def playerControl(sc, newBoard, playerNames):
                 playerInputDirection = playerDirections[4]
                 sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
                 sc.sendall(newBoard.boardString().encode('utf-8'))
-                sc.close()
+                break
             elif first_four_only == playerDirectionDecimals[
                 5]:  # when G is hit, print the scores, print the board, and then transmit the board
+                playerInputDirection = playerDirections[5]
                 with lock:
                     newBoard.printScore() # anything that is accessing newBoard and doing something on newboard we need to lock it so that its consistent
                 sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
@@ -84,6 +83,7 @@ def playerControl(sc, newBoard, playerNames):
                 newBoard.move_player(playerNames[1], playerInputDirection)
             display(newBoard)
 
+
 class Game:
     def __init__(self):
         pass
@@ -91,9 +91,6 @@ class Game:
     def start(self):
         newBoard = Board(5, 10, 5, 10, 2)  # creating the new boar
         playerNames = ["1", "2"]  # list of players that will be added
-        clientCounter = 0
-        connections = {} # perhaps for clients, the name is just player one or two based on whos been connected, and the value is whatever is returned from socket(AF_Inet, SOCK_STREAM)
-                        # sc.getpeername is the clinets ip and port tho
         HOST = ''
         PORT = 12345
 
@@ -119,16 +116,14 @@ class Game:
         while True:
             try:
                 display(newBoard) #displays the original board
-                #The question is do i need to keep doing it this way or do i have to break it up and do it
-                # similar to the wya the test_server is doing it with clients
                 with socket(AF_INET, SOCK_STREAM) as sock:  # TCP socket
                     sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)  # Details later
                     sock.bind((HOST, PORT))  # Claim messages sent to port "PORT"
                     sock.listen(1)  # Server only supports a single 3-way handshake at a time
                     print('Server:', sock.getsockname())  # Server IP and port
                     while True:
-                        # if clientCount < 3: run the thread command and sc stuff
                         sc, _ = sock.accept()  # Wait until a connection is established
+                        # Creating the threads for sc
                         thread_list.append(Thread(target=playerControl, args=(sc, newBoard, playerNames, )).start())
                 for t in thread_list:
                     t.join()  # kill command need the children to be killed before main ends
