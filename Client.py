@@ -8,6 +8,7 @@ BUF_SIZE = 1024
 HOST = '127.0.0.1'
 PORT = 12345
 directionsString = ['U', 'D', 'L', 'R', 'Q', 'G']
+playerDirectionString = ['2', '3', '4', '6', '8', '15']
 directionsBytes = [b'\x0010', b'\x0011', b'\x0100', b'\x0110', b'\x1000', b'\x1111']
 directionHeaderSize = 4
 endBuffer = b'\x00'
@@ -42,38 +43,13 @@ PLAYER2_NAME = '2'
 ERROR = b'E'
 OK = b'O'
 
+def printScores(data):
+    # scores = sock.recv(BUF_SIZE) sock.revc(BUF_SIZE)would be passed into the function
+    score1 = unpack('!H', data[0:2])[0]
+    score2 = unpack('!H', data[2:4])[0]
+    print('Score1', score1)
+    print('Score2', score2)
 
-# gets the buffer size of the data being sent through and returns it in bytes
-def get_buf(current_socket: socket, expected_size: int) -> bytes:
-    current_size = 0
-    buffer = b''
-    while current_size < expected_size:
-        data = current_socket.recv(expected_size - current_size)
-        if data == b'':
-            return buffer
-        buffer = buffer + data
-        current_size = current_size + len(data)
-
-    return buffer
-
-
-def get_data(client: socket) -> bytes:
-    print('Client', client.getsockname(), 'waiting for data')
-    header = get_buf(client, HEADER_LEN)
-    print('Client', client.getsockname(), 'Header', header, header.hex())
-    data_len = unpack('!H', header)[0]
-    data = get_buf(client, data_len)
-    print('Client', client.getsockname(), 'Data', data, data.hex())
-    return data
-
-#i think this just sends data and then also gets data at the same time
-def put_data(data: str) -> bytes:
-    client = connections[data[-1]]
-    encoded_data = bytes.fromhex(data)
-    print('Client', client.getsockname(), 'sending', data, '(', encoded_data.hex(), ')')
-    client.sendall(encoded_data)
-    response = get_data(client)
-    return response
 
 #when the server sends over the client id, for the rest of the connection the clinet will send back
 # every direction byte with the client number in bytes appended onto it. ie send should be like 00100100 still
@@ -86,40 +62,77 @@ def main():
         print('BinaryID', player_id_binary)
         player_hex_id = player_id_binary.hex()
         print('HexID',player_hex_id)
+        player_int_number = int.from_bytes(player_id_binary, byteorder='big')
+        print(player_int_number)
         # play_id_int = int(player_id_binary)
         # print(play_id_int)
         # # sock.sendall(data) # Server IP and port implicit due to connect call
         # print('clientNumber:', play_id_int)
+        #player totallity checker
+        if player_int_number/4 > 2:
+            print("too many clients closing the connection")
+            return
 
         while True:
-            directionInput = input("please enter a direction ")
+            directionInput = input("please enter a direction: ")
             if directionInput == directionsString[0]: #direction is U
                 # actually want to use put_data, to send all data to the server
-                put_data('2' + player_hex_id)
+                # put_data('2' + player_hex_id)
                 # byteString = directionsBytes[0] + player_id_binary + endBuffer # making a binary string of the command info
                 # #sendCommand = struct.pack("!H",directionsBytes[0]).join(player_id_binary).join(endBuffer)
                 # print('bytes', byteString)
-                # sock.sendall(byteString)
+                # sock.sendall(bytes.fromhex('2' + player_hex_id))
+                sock.sendall(bytes.fromhex(playerDirectionString[0] + str(player_int_number)))
+                #not working
+                scores = sock.recv(BUF_SIZE)
+                # printScores(sock.recv(BUF_SIZE))
+
+                score1 = unpack('!H', scores[0:2])[0]
+                score2 = unpack('!H', scores[2:4])[0]
+                print('Score1', score1)
+                print('Score2', score2)
+
+                board = sock.recv(BUF_SIZE)
+                board.decode('utf-8')
+                print(board)
+
             elif directionInput == directionsString[1]: #direction is D
-                sendCommand = struct.pack("!H",directionsBytes[1]).join(player_id_binary).join(endBuffer)
-                sock.sendall(sendCommand)
-                print(sendCommand)
+                # sendCommand = struct.pack("!H",directionsBytes[1]).join(player_id_binary).join(endBuffer)
+                # sock.sendall(sendCommand)
+                # print(sendCommand)
+                sock.sendall(bytes.fromhex(playerDirectionString[1] + str(player_int_number)))
             elif directionInput == directionsString[2]: #direction is L
-                sendCommand = struct.pack("!H", directionsBytes[2]).join(player_id_binary).join(endBuffer)
-                sock.sendall(sendCommand)
-                print(sendCommand)
+                # sendCommand = struct.pack("!H", directionsBytes[2]).join(player_id_binary).join(endBuffer)
+                # sock.sendall(sendCommand)
+                # print(sendCommand)
+                sock.sendall(bytes.fromhex(playerDirectionString[2] + str(player_int_number)))
             elif directionInput == directionsString[3]: # direction is R
-                sendCommand = struct.pack("!H", directionsBytes[3]).join(player_id_binary).join(endBuffer)
-                sock.sendall(sendCommand)
-                print(sendCommand)
+                # sendCommand = struct.pack("!H", directionsBytes[3]).join(player_id_binary).join(endBuffer)
+                # sock.sendall(sendCommand)
+                # print(sendCommand)
+                sock.sendall(bytes.fromhex(playerDirectionString[3] + str(player_int_number)))
             elif directionInput == directionsString[4]: # direction is Q
-                sendCommand = struct.pack("!H", directionsBytes[4]).join(player_id_binary).join(endBuffer)
-                sock.sendall(sendCommand)
-                print(sendCommand)
+                # sendCommand = struct.pack("!H", directionsBytes[4]).join(player_id_binary).join(endBuffer)
+                # sock.sendall(sendCommand)
+                # print(sendCommand)
+                sock.sendall(bytes.fromhex(playerDirectionString[4] + str(player_int_number)))
+                scores = sock.recv(BUF_SIZE)
+                score1 = unpack('!H', scores[0:2])[0]
+                score2 = unpack('!H', scores[2:4])[0]
+                print('Score1', score1)
+                print('Score2', score2)
+                board = sock.recv(BUF_SIZE)
+                board.decode('utf-8')
+                print(board)
+                return
+                #gonna need to recieve the scores and board and print them. them return so the connection dies
             elif directionInput == directionsString[5]: # direction is G
-                sendCommand = struct.pack("!H", directionsBytes[5]).join(player_id_binary).join(endBuffer)
-                sock.sendall(sendCommand)
-                print(sendCommand)
+                # sendCommand = struct.pack("!H", directionsBytes[5]).join(player_id_binary).join(endBuffer)
+                # sock.sendall(sendCommand)
+                # print(sendCommand)
+                sock.sendall(bytes.fromhex(playerDirectionString[5] + str(player_int_number)))
+
+
 
 
         # this is all the input info where we repeatedly as for input and then send that as bytes but will need to change it from the letter you get to hex asci to binray or something

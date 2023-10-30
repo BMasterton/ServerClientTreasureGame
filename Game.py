@@ -16,68 +16,73 @@ playerCounter = 0
 def playerControl(sc, newBoard, playerNames):
     global playerCounter
     with sc:
+        #probably need something better here
         if playerCounter < 4: # setting player with playerCounter
             playerCounter += 1
         if playerCounter == 1:
-            sc.sendall(b'\x01')
+            sc.sendall(b'\x04')
         elif playerCounter == 2:
-            sc.sendall(b'\x10')
+            sc.sendall(b'\x08')
         elif playerCounter == 3:
-            errorMessage = "2 players exist, closing connection"
-            sc.sendall(errorMessage.encode('utf-8'))
-            sc.close()
-        print('Client:', sc.getpeername())  # Client IP and port
-        data = sc.recv(BUF_SIZE)  # us this to get info from client with 1 byte of info maybe make this BUD_SIZE
-        print('Data', data)
-        data2 = list(data)
-        print('Data-2', data2)
-        my_byte = data2[0]
-        print('MyByte',my_byte)
-        first_four_full = my_byte & 240
-        first_four_only = first_four_full >> 4
-        middle_two_full = my_byte & 12
-        middle_two_only = middle_two_full >> 2
-        if first_four_only == playerDirectionDecimals[0]:  # direction Up
-            playerInputDirection = playerDirections[0]
-            sc.sendall(
-                struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-        elif first_four_only == playerDirectionDecimals[1]:  # direction Down
-            playerInputDirection = playerDirections[1]
-            sc.sendall(
-                struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-        elif first_four_only == playerDirectionDecimals[2]:  # direction Left
-            playerInputDirection = playerDirections[2]
-            sc.sendall(
-                struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-        elif first_four_only == playerDirectionDecimals[3]:  # direction Right
-            playerInputDirection = playerDirections[3]
-            sc.sendall(
-                struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-        elif first_four_only == playerDirectionDecimals[
-            4]:  # when Q is received run send the scores of 1 and then 2 as shorts, send gameboard then itll run the quit command
-            playerInputDirection = playerDirections[4]
-            sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-            sc.sendall(newBoard.boardString().encode('utf-8'))
-        elif first_four_only == playerDirectionDecimals[
-            5]:  # when G is hit, print the scores, print the board, and then transmit the board
-            with lock:
-                newBoard.printScore() # anything that is accessing newBoard and doing something on newboard we need to lock it so that its consistent
-            sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
-            display(newBoard)
-            sc.sendall(newBoard.boardString().encode('utf-8'))
-        playerInputPlayer = str(middle_two_only)
-        print('Data', data)  # printing the data we receive
 
-        # making sure the directions and players are allowed choices or reject
-        if playerInputDirection not in playerDirections:
-            raise Exception('Must give a valid direction or quit')
-        if playerInputPlayer not in playerNames:
-            raise Exception('value must be 1 or 2')
-        if playerInputPlayer == '1':
-            newBoard.move_player(playerNames[0], playerInputDirection)
-        elif playerInputPlayer == '2':
-            newBoard.move_player(playerNames[1], playerInputDirection)
-        display(newBoard)
+            sc.sendall(b'\x12')
+            sc.close()
+
+        while True:
+            print('Client:', sc.getpeername())  # Client IP and port
+            data = sc.recv(BUF_SIZE)  # us this to get info from client with 1 byte of info maybe make this BUD_SIZE
+            print('Data', data)
+            data2 = list(data)
+            print('Data-2', data2)
+            my_byte = data2[0]
+            print('MyByte',my_byte)
+            first_four_full = my_byte & 240
+            first_four_only = first_four_full >> 4
+            middle_two_full = my_byte & 12
+            middle_two_only = middle_two_full >> 2
+            if first_four_only == playerDirectionDecimals[0]:  # direction Up
+                playerInputDirection = playerDirections[0]
+                sc.sendall(
+                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
+                sc.sendall(newBoard.boardString().encode('utf-8'))
+            elif first_four_only == playerDirectionDecimals[1]:  # direction Down
+                playerInputDirection = playerDirections[1]
+                sc.sendall(
+                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
+            elif first_four_only == playerDirectionDecimals[2]:  # direction Left
+                playerInputDirection = playerDirections[2]
+                sc.sendall(
+                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
+            elif first_four_only == playerDirectionDecimals[3]:  # direction Right
+                playerInputDirection = playerDirections[3]
+                sc.sendall(
+                    struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
+            elif first_four_only == playerDirectionDecimals[
+                4]:  # when Q is received run send the scores of 1 and then 2 as shorts, send gameboard then itll run the quit command
+                playerInputDirection = playerDirections[4]
+                sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
+                sc.sendall(newBoard.boardString().encode('utf-8'))
+                sc.close()
+            elif first_four_only == playerDirectionDecimals[
+                5]:  # when G is hit, print the scores, print the board, and then transmit the board
+                with lock:
+                    newBoard.printScore() # anything that is accessing newBoard and doing something on newboard we need to lock it so that its consistent
+                sc.sendall(struct.pack('!HH', newBoard.printPlayerScore('1'), newBoard.printPlayerScore('2')))
+                display(newBoard)
+                sc.sendall(newBoard.boardString().encode('utf-8'))
+            playerInputPlayer = str(middle_two_only)
+            print('Data', data)  # printing the data we receive
+
+            # making sure the directions and players are allowed choices or reject
+            if playerInputDirection not in playerDirections:
+                raise Exception('Must give a valid direction or quit')
+            if playerInputPlayer not in playerNames:
+                raise Exception('value must be 1 or 2')
+            if playerInputPlayer == '1':
+                newBoard.move_player(playerNames[0], playerInputDirection)
+            elif playerInputPlayer == '2':
+                newBoard.move_player(playerNames[1], playerInputDirection)
+            display(newBoard)
 
 class Game:
     def __init__(self):
@@ -109,8 +114,7 @@ class Game:
         #     thread_list.append(Thread(target=playerControl, args=(i, )))
         #     thread_list[-1].start()
         #
-        # for t in thread_list:
-        #     t.join() #kill command need the children to be killed before main ends
+
 
         while True:
             try:
@@ -126,6 +130,8 @@ class Game:
                         # if clientCount < 3: run the thread command and sc stuff
                         sc, _ = sock.accept()  # Wait until a connection is established
                         thread_list.append(Thread(target=playerControl, args=(sc, newBoard, playerNames, )).start())
+                for t in thread_list:
+                    t.join()  # kill command need the children to be killed before main ends
             except Exception as details:
                 print(str(details))
 
