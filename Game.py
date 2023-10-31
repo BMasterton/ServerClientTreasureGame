@@ -33,6 +33,14 @@ def playerPack(data):
     data_to_send = data_length + data
     return data_to_send
 
+
+def playerMoveData(newBoard, playerInputDirection, playerId):
+    if playerInputDirection not in playerDirections:
+        raise Exception('Must give a valid direction or quit')
+    # playerInputPlayer needs to be the connection number which would be 1 or 2
+    newBoard.move_player(str(playerId), playerInputDirection)
+    display(newBoard)
+
 # Main thread function that deals with all logic for the boards and players
 def playerControl(sc, newBoard, playerNames):
     global playerCounter
@@ -43,59 +51,66 @@ def playerControl(sc, newBoard, playerNames):
         if playerCounter == 1:
             #trying to somehow get each connections value
             playerId = 1
-            data = b'\x04' # data representing player 1, transformed in the client to be an int
+            data = b'\x01' # data representing player 1, transformed in the client to be an int
             sc.sendall(playerPack(data)) #sending player data to the client
         elif playerCounter == 2:
             playerId = 2
-            data = b'\x08'
+            data = b'\x02'
             sc.sendall(playerPack(data))
         elif playerCounter == 3: # this player will still get sent through and cause the client to close
             playerId = 3
-            data = b'\x12'
+            data = b'\x03'
             sc.sendall(playerPack(data))
-            sc.close()
+            quit(1)
 
         while True:
             print('Client:', sc.getpeername())  # Client IP and port
             data = sc.recv(BUF_SIZE) # Receives info from the client as directions
+            print('data from recv', data)
             data2 = list(data)
             my_byte = data2[0]
-            #this mask isnt working and its returning 0 instead of what it should
+            print('my_byte', my_byte)
             first_four_full = my_byte & 15
             print('firstFourFull',first_four_full)
             if first_four_full == playerDirectionDecimals[0]:  # direction Up
                 playerInputDirection = playerDirections[0]
+                playerMoveData(newBoard, playerInputDirection, playerId)
                 sc.sendall(pointPack(newBoard))
             elif first_four_full == playerDirectionDecimals[1]:  # direction Down
                 playerInputDirection = playerDirections[1]
+                playerMoveData(newBoard, playerInputDirection, playerId)
                 sc.sendall(pointPack(newBoard))
             elif first_four_full == playerDirectionDecimals[2]:  # direction Left
                 playerInputDirection = playerDirections[2]
+                playerMoveData(newBoard, playerInputDirection, playerId)
                 sc.sendall(pointPack(newBoard))
             elif first_four_full == playerDirectionDecimals[3]:  # direction Right
                 playerInputDirection = playerDirections[3]
+                playerMoveData(newBoard, playerInputDirection, playerId)
                 sc.sendall(pointPack(newBoard))
             elif first_four_full == playerDirectionDecimals[
                 4]:  # when Q is received run send the scores of 1 and then 2 as shorts, send gameboard then itll run the quit command
                 playerInputDirection = playerDirections[4]
                 sc.sendall(pointPack(newBoard))
                 sc.sendall(boardPack(newBoard))
+                playerMoveData(newBoard, playerInputDirection, playerId)
                 break
             elif first_four_full == playerDirectionDecimals[
                 5]:  # when G is hit, print the scores, print the board, and then transmit the board
                 playerInputDirection = playerDirections[5]
+                playerMoveData(newBoard, playerInputDirection, playerId)
                 with lock:
                     newBoard.printScore() # anything that is accessing newBoard and doing something on newboard we need to lock it so that its consistent
                 display(newBoard)
+                sc.sendall(pointPack(newBoard))
                 sc.sendall(boardPack(newBoard))
-            print('Data', data)  # printing the data we receive
 
             # making sure the directions and players are allowed choices or reject
-            if playerInputDirection not in playerDirections:
-                raise Exception('Must give a valid direction or quit')
-            #playerInputPlayer needs to be the connection number which would be 1 or 2
-            newBoard.move_player(playerId, playerInputDirection)
-            display(newBoard)
+            # if playerInputDirection not in playerDirections:
+            #     raise Exception('Must give a valid direction or quit')
+            # #playerInputPlayer needs to be the connection number which would be 1 or 2
+            # newBoard.move_player(str(playerId), playerInputDirection)
+            # display(newBoard)
 
 
 class Game:
