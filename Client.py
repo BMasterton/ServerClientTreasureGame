@@ -42,11 +42,6 @@ def headerCheck(sock):  # there will always be two initial bytes, which are the 
     return next_bytes
 
 
-#does some math to get a correct player number
-def playerInt(playerIntNumber):
-    return playerIntNumber / 4
-
-
 # main function that gets the client number and connects to the server, will repeatedly ask for an input
 #send it over to the server and print out any retured info sent back from the client so the user can see whats going on
 def main():
@@ -63,8 +58,8 @@ def main():
             next_bytes = sock.recv(num_bytes - bytes_read)
             bytes_read += len(next_bytes)
             bytes_from_server += next_bytes
-            int_from_server = int.from_bytes(bytes_from_server, byteorder='big')
-            print('Intfromserver', int_from_server)
+            playerID = int.from_bytes(bytes_from_server, byteorder='big')
+            print('Intfromserver', playerID)
         print('bytes from server',bytes_from_server)
 
         print('Client:', sock.getsockname()) # Client IP and port
@@ -74,7 +69,7 @@ def main():
         print('Player ID', player_int_number)
 
         #player totallity checker closes client if a third is added
-        if int_from_server > 2:
+        if playerID > 2:
             print("too many clients closing the connection")
             return
 
