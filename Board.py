@@ -200,7 +200,7 @@ class Board:
                     self.treasureCheck()
                 case 'q' | 'Q':
                     self.printScore()
-                    exit()
+                    # exit()
                 case _:
                     print()
         except ValueError as details:
