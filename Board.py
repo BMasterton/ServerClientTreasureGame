@@ -13,7 +13,7 @@ class Board:
         self.min_val = min_val
         self.max_val = max_val
         self.board = [[Tile() for _ in range(n)] for _ in range(n)]
-        self.treasureCount = t
+        self.treasureCount = t +1
         self.score = 0
         if n < 2:
             raise ValueError('n must not be less than 2')
@@ -38,36 +38,42 @@ class Board:
                 randNumX = random.randrange(0, self.n)
                 randNumY = random.randrange(0, self.n)
             self.board[randNumX][randNumY].treasure = Treasure(treasureValue)
-    # as an example bob would be the key and the values would be the x and y coords
+
+    #player dictionary holds the players names and their current locations
     players = {
         "name": None,
     }
+
     # adds / creates a player object to the board at a random coord, and sets the dictionary that 
     # holds name and coord info 
     def add_player(self, name, xCord, yCord):
         self.board[xCord][yCord].add_player(Player(name, 0))
         self.players[name] = [xCord, yCord]
 
+    #simple function that just sees if the game is over, if there are no treasures left then the game ends and we can print the total players point and exit the game
     def treasureCheck(self):
-        if self.treasureCount < 0:
+        if self.treasureCount == 0:
             for row in self.board:
                 for tile in row:
                     if tile.get_player_from_current_tile() is not None:
                         print("Player ", tile, " collected a total of: ", tile.player.score, " points")
             exit(0)
 
+    # function for just printing the score
     def printScore(self):
         for row in self.board:
             for tile in row:
                 if tile.get_player_from_current_tile() is not None:
                     print("Player ", tile, " collected a total of: ", tile.player.score, " points")
 
+    #function for returning the score so it can be send to the client
     def printPlayerScore(self, name):
         for row in self.board:
             for tile in row:
                 if tile.get_player_from_current_tile() is not None and tile.get_player_from_current_tile().name == name:
                     return tile.get_player_from_current_tile().get_score()
 
+    #The string version of the entire board object, used to send over to the client
     def boardString(self):
         boardView = ""
         for row in self.board:
@@ -94,7 +100,7 @@ class Board:
             boardView += '\n'
         return boardView
 
-    #Takes in the new and old board locations, the name, and what direction and changes all values
+    #Takes in the new and old board locations, the name, and what direction and changes all values assocaited with that tile
     def change_tile_values(self, initialx, initialy, changesxory, name, positioning, direction):
         #picking if its up or down direction
         if positioning == 'vertical':
@@ -194,7 +200,7 @@ class Board:
                     self.treasureCheck()
                 case 'q' | 'Q':
                     self.printScore()
-                    exit()
+                    # exit()
                 case _:
                     print()
         except ValueError as details:
