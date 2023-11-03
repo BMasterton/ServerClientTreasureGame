@@ -47,7 +47,8 @@ def headerCheck(sock):  # there will always be two initial bytes, which are the 
 def main():
     with socket(AF_INET, SOCK_STREAM) as sock: # TCP socket
         sock.connect((HOST, PORT)) # Initiates 3-way handsha
-        data_length_bytes = sock.recv(HEADER_LEN)
+        #below function is receiving data from header and then rest of needed data in recv buffer
+        data_length_bytes = sock.recv(HEADER_LEN) # grabs the length of the header being sent it
         if len(data_length_bytes) != 2:
             raise Exception('Could not recieve Length of header!')
         num_bytes = struct.unpack('!H', data_length_bytes)[0]  # unpack Data, and read the first (and only) unsigned int
@@ -55,18 +56,12 @@ def main():
         bytes_read = 0
         bytes_from_server = b''
         while bytes_read < num_bytes:
-            next_bytes = sock.recv(num_bytes - bytes_read)
+            next_bytes = sock.recv(num_bytes - bytes_read) # get the next bit of data with header length, so wanted data minus header
             bytes_read += len(next_bytes)
             bytes_from_server += next_bytes
             playerID = int.from_bytes(bytes_from_server, byteorder='big')
             print('Intfromserver', playerID)
         print('bytes from server',bytes_from_server)
-
-        print('Client:', sock.getsockname()) # Client IP and port
-        print('BinaryID', bytes_from_server)
-        player_hex_id = bytes_from_server.hex()
-        player_int_number = int.from_bytes(bytes_from_server, byteorder='big')
-        print('Player ID', player_int_number)
 
         #player totallity checker closes client if a third is added
         if playerID > 2:
@@ -79,7 +74,7 @@ def main():
                 sock.sendall(directionsBytes[0]) # sending the information back to the server
                 printScores(headerCheck(sock)) # print out the scores with the socket of the size returned from the header
             elif directionInput == directionsString[1]: #direction is D
-                sock.sendall(directionsBytes[1] )
+                sock.sendall(directionsBytes[1]) # returning one byte that is the byte string that represents the hex value of Up which is 2
                 printScores(headerCheck(sock))
             elif directionInput == directionsString[2]: #direction is L
                 sock.sendall(directionsBytes[2])
