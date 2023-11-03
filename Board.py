@@ -168,10 +168,10 @@ class Board:
                     positioning = 'vertical'
                     direction = 'U'
                     #grab initial player location
-                    initialXLocation = self.players[name][0]
-                    initialYLocation = self.players[name][1]
+                    initialXLocation = self.players[name][0] #setting the initial locations
+                    initialYLocation = self.players[name][1] # setting the initila locations
                     #new location value based on direction picked
-                    newXLocation = initialXLocation -1
+                    newXLocation = initialXLocation -1 # changing location data
                     self.change_tile_values(initialXLocation, initialYLocation, newXLocation, name, positioning, direction) 
                     self.treasureCheck()
                 case 'd' | 'D':

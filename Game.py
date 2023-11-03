@@ -5,7 +5,6 @@ from View import display
 from Board import Board
 from threading import Semaphore
 import random
-from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from asyncio import run, start_server, StreamReader, StreamWriter
 
 playerDirections = ['U', 'D', 'L', 'R', 'Q', 'G'] # string version of all directions that can be picked
@@ -17,34 +16,33 @@ playerCounter = 0 # keeps track of the connections
 
 #packs up all the points and headers for the points to send over to the client
 def pointPack(newBoard):
-    score1_bin = struct.pack('!H', int(newBoard.printPlayerScore('1')))
+    score1_bin = struct.pack('!H', int(newBoard.printPlayerScore('1'))) # packing the scores as unsigned ints
     score2_bin = struct.pack('!H', int(newBoard.printPlayerScore('2')))
     scores_len = 4
-    scores_header = struct.pack('!H', scores_len)
-    return scores_header + score1_bin + score2_bin
+    scores_header = struct.pack('!H', scores_len) # packing the length as unsigned int
+    return scores_header + score1_bin + score2_bin # returning the value of all packed, header and points
 
 
 #takes in a newboard and returns the packed version of the board with the header length prepended
 def boardPack(newBoard):
-    payload = newBoard.boardString().encode('utf-8')
-    payload_len = len(payload)
-    payload_header = struct.pack('!H', payload_len)
-    return payload_header + payload
+    payload = newBoard.boardString().encode('utf-8') #encoding the boardstring in utf-8, same as packing but with a string
+    payload_len = len(payload) # get the length of the string to be sent
+    payload_header = struct.pack('!H', payload_len) # pack the header
+    return payload_header + payload # return appended values
 
 
 #takes in the byte string representing the player and returns the header length and player byte string
 def playerPack(data):
-    data_length = struct.pack('!H', len(data))
-    data_to_send = data_length + data
+    data_length = struct.pack('!H', len(data)) # pack the length of the playerid data
+    data_to_send = data_length + data # concat it to the sending data
     return data_to_send
 
-
+# Check to make sure direction is correct then runs move player and displays board for player
 def playerMoveData(newBoard, playerInputDirection, playerId):
     if playerInputDirection not in playerDirections:
         raise Exception('Must give a valid direction or quit')
-    # playerInputPlayer needs to be the connection number which would be 1 or 2
-    newBoard.move_player(str(playerId), playerInputDirection)
-    display(newBoard)
+    newBoard.move_player(str(playerId), playerInputDirection) # move player on the board
+    display(newBoard) # displays the board
 
 
 class Game:
@@ -56,7 +54,6 @@ class Game:
         playerNames = ["1", "2"]  # list of players that will be added
         HOST = ''
         PORT = 12345
-        thread_list = []
 
         async def playerControl(reader: StreamReader, writer: StreamWriter) -> None:
             global playerCounter
@@ -84,22 +81,21 @@ class Game:
 
 
             while True:
-                # print('Client:', sc.getpeername())  # Client IP and port
-                addr = writer.get_extra_info('peername')
+                addr = writer.get_extra_info('peername') # grabbing extra peername data from writer
                 print('Address', addr)
-                data = await reader.read(BUF_SIZE)
+                data = await reader.read(BUF_SIZE) # retrieving data from the reader
                 print('data from recv', data)
                 data2 = list(data)
                 my_byte = data2[0]
                 print('my_byte', my_byte)
-                first_four_full = my_byte & 15
+                first_four_full = my_byte & 15 # bit masking the direction data which is always 4 bits
                 print('firstFourFull', first_four_full)
                 # since all the directions do the same thing theres a more dry way to do it
                 if first_four_full == playerDirectionDecimals[0]:  # direction Up
                     playerInputDirection = playerDirections[0]
-                    playerMoveData(self.newBoard, playerInputDirection, playerId)
-                    writer.write(pointPack(self.newBoard))
-                    await writer.drain()
+                    playerMoveData(self.newBoard, playerInputDirection, playerId) # Moving the player
+                    writer.write(pointPack(self.newBoard)) # writing data to client, with packed data
+                    await writer.drain() # wait until sucessfull transfer compelted
                 elif first_four_full == playerDirectionDecimals[1]:  # direction Down
                     playerInputDirection = playerDirections[1]
                     playerMoveData(self.newBoard, playerInputDirection, playerId)
@@ -118,9 +114,9 @@ class Game:
                 elif first_four_full == playerDirectionDecimals[
                     4]:  # when Q is received run send the scores of 1 and then 2 as shorts, send gameboard then itll run the quit command
                     playerInputDirection = playerDirections[4]
-                    writer.write(pointPack(self.newBoard))
+                    writer.write(pointPack(self.newBoard)) # send the points
                     await writer.drain()
-                    writer.write(boardPack(self.newBoard))
+                    writer.write(boardPack(self.newBoard)) # send the board
                     await writer.drain()
                     playerMoveData(self.newBoard, playerInputDirection, playerId)
                     return
@@ -131,9 +127,9 @@ class Game:
                     with lock:
                         self.newBoard.printScore()  # anything that is accessing newBoard and doing something on newboard we need to lock it so that its consistent
                     display(self.newBoard)
-                    writer.write(pointPack(self.newBoard))
+                    writer.write(pointPack(self.newBoard)) # send the points
                     await writer.drain()
-                    writer.write(boardPack(self.newBoard))
+                    writer.write(boardPack(self.newBoard)) # send the board
                     await writer.drain()
 
 
@@ -150,8 +146,9 @@ class Game:
 
         display(self.newBoard)
 
+        # main function who will run the playerControl function, this will open up asyncio connection to client for however many clients
         async def main() -> None:
-            server = await asyncio.start_server(playerControl, '', 12345)
+            server = await asyncio.start_server(playerControl, HOST, PORT)
             await server.serve_forever()
 
 

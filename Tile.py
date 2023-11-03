@@ -22,30 +22,39 @@ class Tile:
     def add_player(self, player: Player):
         self.player = player
 
+    # sets player to None
     def set_player_to_None(self):
         self.player = None
-        
+
+    # Sets treasure to None
     def set_treasure_to_None(self):
         self.treasure = None
-        
+
+    # sets the description back to its original form of '.'
     def set_description_to_original(self):
         self.description = '.'
-        
+
+    # sets the description to input string
     def set_description_to_name(self, name: str):
         self.description = name
-        
+
+    # sets player to the current tile when moving around
     def set_player_to_current_tile(self, player: Player):
         self.player = player
-        
+
+    # grabs the player from the current tile to do work on
     def get_player_from_current_tile(self):
         return self.player
-    
+
+    # returns the treasure
     def get_treasure(self):
         return self.treasure
 
+    # Sets the treasure to wanted value
     def set_treasure(self, treasure: Treasure):
         self.treasure = treasure
 
+    # returns description
     def get_description(self):
         return self.description
 
