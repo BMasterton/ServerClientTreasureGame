@@ -151,7 +151,7 @@ class Game:
         display(self.newBoard)
 
         async def main() -> None:
-            server = await asyncio.start_server(playerControl, '127.0.0.1', 12345)
+            server = await asyncio.start_server(playerControl, '', 12345)
             await server.serve_forever()
 
 
