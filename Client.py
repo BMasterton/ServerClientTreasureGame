@@ -28,7 +28,7 @@ def printBoard(board):
 
 
 # gets the header length and then gets the next bit of data based on the length the header gave
-def headerCheck(sock):  # there will always be two initial bytes, which are the length header
+def headerCheck(sock: socket):  # there will always be two initial bytes, which are the length header
     data = sock.recv(HEADER_LEN)
     if len(data) != 2:
         raise Exception('Could not recieve Length of header!')
