@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Board</title>
+    </head>
+    <body>
+        <form action="" method="post">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>label </th>
+                </tr>
+
+            </thead>
+            <tbody>
+             {% for label in labels %}
+                <tr>
+                {% for label in row_labels %}
+                    <td>
+                        {{ label }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Submit">
+    </form>
+    </body>
+</html>
