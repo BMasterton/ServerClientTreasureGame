@@ -7,5 +7,5 @@ urlpatterns = [
     path('player/create/', views.PlayerCreate.as_view(), name='player_create'),
     path('player/update/<int:pk>/', views.PlayerUpdate.as_view(),name='player_update'),
     path('create/', views.CreateGame.as_view(), name='create' ),
-   # path('display/<int:player_id>', views.displayPlayer),
+    path('display/<int:player_number>', views.displayPlayer, name='display_player'),
 ]
