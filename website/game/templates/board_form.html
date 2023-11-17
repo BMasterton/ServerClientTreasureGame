@@ -25,9 +25,16 @@
             {% endfor %}
             </tbody>
         </table>
-            <button type="submit" value="1" name="player_number"> Player 1 </button>
-            <button type="submit" value="2" name="player_number"> Player 2 </button>
+
             <br>
     </form>
+     <form action='/game/display/1' method='GET'>
+               {% csrf_token %}
+                <button type='submit' value='1' name='player_number'> Player 1 </button>
+           </form>
+            <form action='/game/display/2' method='GET'>
+            {% csrf_token %}
+                <button type='submit' value='2' name='player_number'> Player 2 </button>
+            </form>
     </body>
 </html>

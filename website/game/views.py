@@ -4,7 +4,9 @@ from .models import Player, Board
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 import random
+from django.db import transaction
 
+#checking is a cell doesnt exist if there is a value in that cell then we return false else the oposite
 def doesCellNotExist(row, col): #so we know what is at a given table location
     value = Board.objects.filter(row = row, col = col).first()
     if value:
@@ -12,47 +14,51 @@ def doesCellNotExist(row, col): #so we know what is at a given table location
     else:
         return True
 
-def addTreasure(): #randomly grab values, and put them in table value based on row and colum, check first for if tht spot has a value
+# Will be adding 5 treasures, we grab random locations and a value, and we check to see if the random spot exists
+# if there is nothing in that spot then we add the new treaure value and we set the label to be a $ indicating something is there
+def addTreasure():
     counter = 0
     while counter < 5:
         row = random.randint(0,9)
         column = random.randint(0,9)
         value = random.randint(1,10)
-        if doesCellNotExist(row, column):
-            new_cell = Board()
+        if doesCellNotExist(row, column): # if that cell is free
+            new_cell = Board() # creating a new board model
             new_cell.col = column
             new_cell.row = row
             new_cell.label = "$"
             new_cell.value = value
-            new_cell.save()
+            new_cell.save() # save all changes made
             counter += 1
         else:
             continue
 
-
+#adding a player just like treausure but only 2 thing time
 def addPlayer():
     counter = 0
     while counter < 2:
         row = random.randint(0, 9)
         column = random.randint(0, 9)
         if doesCellNotExist(row, column):
-            new_cell = Player()
+            new_cell = Player() # creating a new player model
             new_cell.col = column
             new_cell.row = row
             new_cell.name = str(counter+1)
             new_cell.score = 0
-            new_cell.save()
+            new_cell.save() # making sure we save all changes made
             counter += 1
         else:
             continue
 
 
+#this displays the board through the board_form.html.
 def display(request):
     #the request here will get the info from sumbitted form in the html, then enter that data
-    context = getLabelContext()
+    context = getLabelContext() # all data in the board is returned from this, anything that has a value
     return render(request, "board_form.html", context)
 
-
+# creates the game, so we delete all the old objects we created before, and we make the board model, we then 'fill'
+#the board with treasures and players
 class CreateGame(CreateView):
     Board.objects.all().delete()
     Player.objects.all().delete()
@@ -62,28 +68,27 @@ class CreateGame(CreateView):
     addPlayer()
     success_url = reverse_lazy('create')
 
+#Creates the player model
 class PlayerCreate(CreateView):
     model = Player
     fields = '__all__'
     success_url = reverse_lazy('players')
 
+#can be used to update the player model
 class PlayerUpdate(UpdateView):
     model = Player
     fields = ['row', 'col']
     success_url = reverse_lazy('players')
 
-
-
-def get_all_players(request): #probably gonna hav to use with score at some point 
+# returns an httpresponse with all player names and prints them to the screen to see
+def get_all_players(request):
     players = Player.objects.all()
     result = ''
     for player in players:
         result += str(player) + '<br>'
     return HttpResponse(result)
 
-def index(request):
-    return HttpResponse('Hello World1!')
-
+# used just like get_all_players, but only returns the value of the requested player
 def get_player(request, player_id):
     players = Player.objects.filter(pk=player_id)
     if len(players) == 1:
@@ -92,18 +97,40 @@ def get_player(request, player_id):
     else:
         return HttpResponse('No such player')
 
-def get_player_Score(request, player_number ):
-    player = Player.objects.filter(name=player_number).first()
+# uses player_number to search for and display the player score on screen
+def get_player_Scores():
+    players = Player.objects.all()
+    result = ''
+    for player in players:
+        result += str(player.name) + str(player.score) +'<br>'
+    return HttpResponse(result)
 
+def addIfTreasure(playerRow, playerColumn):
+    cell = Board.objects.filter(row=playerRow, col=playerColumn).first()
+    player = Player.objects.filter(row=playerRow, col=playerColumn).first()
+    if cell and cell.value > 0 : # if there is a call meaning a treasure is there
+        print(f"Before: Player {player.name} Score: {player.score}")
+        player.score += cell.value # score goes back to zero each time
+        player.save()
+        print(f"After: Player {player.name} Score: {player.score}")
+        cell.value = 0 # this is happening
+        cell.save()
+
+
+def isPlayer(playerRow, playerColumn):
+    player = Player.objects.filter(row=playerRow, col=playerColumn).first()
     if player:
-        playerScore = player.score
-    return HttpResponse(str(playerScore))
+        return True
+    else:
+        return False
 
+# this function gets all board and player data makes a matrix out of them, and then sets values to the matrix based on
+#row and col positions. This creates the board visual object
 def getLabelContext():
     board_data = Board.objects.all()
     player_data = Player.objects.all()
 
-    labels = [['' for _ in range(10)] for _ in range(10)]
+    labels = [['' for _ in range(10)] for _ in range(10)] # creating a 10 x 10 matrix
     for data in board_data:
         row, col = data.row - 1, data.col - 1
         labels[row][col] = data.label if data.value else ''
@@ -113,47 +140,50 @@ def getLabelContext():
     context = {'labels': labels}
     return context
 
+#moves the players depending on direction checked, does check for players and treasure
+@transaction.atomic
 def playerMove(player_direction, player_number):
     player = Player.objects.filter(name=player_number).first()
 
     if player:
-        playerRow = player.row
-        playerCol = player.col
-
         # Update player position based on the direction
-        if player_direction == 'U':
-            if playerRow > 0:
-                player.row -= 1
-        elif player_direction == 'D':
-            if playerRow < 9:
+        if player_direction == 'U' and player.row > 1:
+            if not isPlayer(player.row -1, player.col): # stops players from going out of bounds
+                player.row -= 1 # move player
+                player.save() # save the change
+                addIfTreasure(player.row, player.col) # runs add treasure with the current tile
+        elif player_direction == 'D' and player.row < 10:
+            if not isPlayer(player.row + 1, player.col):
                 player.row += 1
-        elif player_direction == 'L':
-            if playerCol > 0:
+                player.save()
+                addIfTreasure(player.row, player.col)
+        elif player_direction == 'L' and player.col > 1:
+            if not isPlayer(player.row , player.col- 1):
                 player.col -= 1
-        elif player_direction == 'R':
-            if playerCol < 9:
+                player.save()
+                addIfTreasure(player.row, player.col)
+        elif player_direction == 'R' and player.col < 10:
+            if not isPlayer(player.row ,player.col + 1):
                 player.col += 1
+                player.save()
+                addIfTreasure(player.row, player.col)
 
         # Save the updated player object
         player.save()
 
         # Redirect or render a response as needed
-        # return redirect('display_player', player_number=player.name)
 
-
-def displayPlayer(request):
+# main function that gets the post request from the html form, and gets a player direction which it
+#will then try to move that player, and printing the string matrix so a player can see whats happening
+def displayPlayer(request, player_number):
     if request.method == 'POST':
-        if request.POST.get('player_number'):
-            player_number = request.POST.get('player_number')
-        elif request.POST.get('player_direction'):
+        if request.POST.get('player_direction'):
             player_direction = request.POST.get('player_direction')
-
-    playerMove(player_direction, player_number)
-
+        playerMove(player_direction, player_number)
 
     context = getLabelContext()
-    if player_number == 1:
+    if player_number == 1: # if its player one then display player1's unique html
         return render(request, 'Player1Display.html', context)
     if player_number == 2:
         return render(request, 'Player2Display.html', context)
-        
+    get_player_Scores() # attempt to print score 
