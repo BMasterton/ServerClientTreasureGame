@@ -123,13 +123,13 @@ def getLabelContext():
     board_data = Board.objects.all()
     player_data = Player.objects.all()
 
-    labels = [['' for _ in range(10)] for _ in range(10)] # creating a 10 x 10 matrix
+    labels = [['.' for _ in range(10)] for _ in range(10)] # creating a 10 x 10 matrix //either add the '.' here
     for data in board_data:
-        row, col = data.row - 1, data.col - 1
-        labels[row][col] = data.label if data.value else ''
+        row, col = data.row , data.col 
+        labels[row][col] = data.label if data.value else '.' #or maybe here
     for data in player_data:
-        row, col = data.row - 1, data.col - 1
-        labels[row][col] = data.name if data.name else ''
+        row, col = data.row , data.col 
+        labels[row][col] = data.name if data.name else '.'
     context = {'labels': labels}
     return context
 
@@ -140,31 +140,27 @@ def playerMove(player_direction, player_number):
 
     if player:
         # Update player position based on the direction
-        if player_direction == 'U' and player.row > 1:
+        if player_direction == 'U' and player.row > 0:
             if not isPlayer(player.row -1, player.col): # stops players from going out of bounds
                 player.row -= 1 # move player
                 player.save() # save the change
                 addIfTreasure(player.row, player.col) # runs add treasure with the current tile
-        elif player_direction == 'D' and player.row < 10:
+        elif player_direction == 'D' and player.row < 9:
             if not isPlayer(player.row + 1, player.col):
                 player.row += 1
                 player.save()
                 addIfTreasure(player.row, player.col)
-        elif player_direction == 'L' and player.col > 1:
+        elif player_direction == 'L' and player.col > 0:
             if not isPlayer(player.row , player.col- 1):
                 player.col -= 1
                 player.save()
                 addIfTreasure(player.row, player.col)
-        elif player_direction == 'R' and player.col < 10:
+        elif player_direction == 'R' and player.col < 9:
             if not isPlayer(player.row ,player.col + 1):
                 player.col += 1
                 player.save()
                 addIfTreasure(player.row, player.col)
 
-        # Save the updated player object
-        player.save()
-
-        # Redirect or render a response as needed
 
 # main function that gets the post request from the html form, and gets a player direction which it
 #will then try to move that player, and printing the string matrix so a player can see whats happening
@@ -176,7 +172,7 @@ def displayPlayer(request, player_number):
 
 
     context = getLabelContext()
-    context['player1_score'] = Player.objects.filter(name=1).first().score
+    context['player1_score'] = Player.objects.filter(name=1).first().score # probably need to fix this.
     context['player2_score'] = Player.objects.filter(name=2).first().score
     if player_number == 1: # if its player one then display player1's unique html
         return render(request, 'Player1Display.html', context)
