@@ -97,7 +97,7 @@ def get_player_Score(request, player_number ):
 
     if player:
         playerScore = player.score
-    return playerScore
+    return HttpResponse(str(playerScore))
 
 def getLabelContext():
     board_data = Board.objects.all()
@@ -140,6 +140,7 @@ def playerMove(player_direction, player_number):
         # Redirect or render a response as needed
         # return redirect('display_player', player_number=player.name)
 
+
 def displayPlayer(request):
     if request.method == 'POST':
         if request.POST.get('player_number'):
@@ -148,6 +149,7 @@ def displayPlayer(request):
             player_direction = request.POST.get('player_direction')
 
     playerMove(player_direction, player_number)
+
 
     context = getLabelContext()
     if player_number == 1:
