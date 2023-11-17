@@ -92,6 +92,12 @@ def get_player(request, player_id):
     else:
         return HttpResponse('No such player')
 
+def get_player_Score(request, player_number ):
+    player = Player.objects.filter(name=player_number).first()
+
+    if player:
+        playerScore = player.score
+    return playerScore
 
 def getLabelContext():
     board_data = Board.objects.all()
@@ -107,22 +113,41 @@ def getLabelContext():
     context = {'labels': labels}
     return context
 
-def getPlayerDirection(request):
-    if request.method =='POST':
-        playerDirection = request.POST.get('player_direction')
+def playerMove(player_direction, player_number):
+    player = Player.objects.filter(name=player_number).first()
 
-# def displayPlayerAfterMovement(request, playerDirection):
-#     if playerDirection is 'U':
-#
+    if player:
+        playerRow = player.row
+        playerCol = player.col
 
+        # Update player position based on the direction
+        if player_direction == 'U':
+            if playerRow > 0:
+                player.row -= 1
+        elif player_direction == 'D':
+            if playerRow < 9:
+                player.row += 1
+        elif player_direction == 'L':
+            if playerCol > 0:
+                player.col -= 1
+        elif player_direction == 'R':
+            if playerCol < 9:
+                player.col += 1
 
-def getPlayerNumber(request):
+        # Save the updated player object
+        player.save()
+
+        # Redirect or render a response as needed
+        # return redirect('display_player', player_number=player.name)
+
+def displayPlayer(request):
     if request.method == 'POST':
-        player_number = request.POST.get('player_number')
-        return redirect('display_player', player_number=player_number)
+        if request.POST.get('player_number'):
+            player_number = request.POST.get('player_number')
+        elif request.POST.get('player_direction'):
+            player_direction = request.POST.get('player_direction')
 
-
-def displayPlayer(request, player_number):
+    playerMove(player_direction, player_number)
 
     context = getLabelContext()
     if player_number == 1:
