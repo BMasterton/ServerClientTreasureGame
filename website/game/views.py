@@ -97,13 +97,6 @@ def get_player(request, player_id):
     else:
         return HttpResponse('No such player')
 
-# uses player_number to search for and display the player score on screen
-def get_player_Scores():
-    players = Player.objects.all()
-    result = ''
-    for player in players:
-        result += str(player.name) + str(player.score) +'<br>'
-    return HttpResponse(result)
 
 def addIfTreasure(playerRow, playerColumn):
     cell = Board.objects.filter(row=playerRow, col=playerColumn).first()
@@ -181,9 +174,11 @@ def displayPlayer(request, player_number):
             player_direction = request.POST.get('player_direction')
         playerMove(player_direction, player_number)
 
+
     context = getLabelContext()
+    context['player1_score'] = Player.objects.filter(name=1).first().score
+    context['player2_score'] = Player.objects.filter(name=2).first().score
     if player_number == 1: # if its player one then display player1's unique html
         return render(request, 'Player1Display.html', context)
     if player_number == 2:
         return render(request, 'Player2Display.html', context)
-    get_player_Scores() # attempt to print score 
