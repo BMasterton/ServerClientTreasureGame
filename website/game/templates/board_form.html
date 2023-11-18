@@ -11,7 +11,6 @@
                 <tr>
                     <th>label </th>
                 </tr>
-
             </thead>
             <tbody>
              {% for row_labels in labels %}
@@ -28,12 +27,12 @@
 
     </form>
      <form action='/game/display/1' method='GET'>
-               {% csrf_token %}
-                <button type='submit' value='1' name='player_number'> Player 1 </button>
-           </form>
-            <form action='/game/display/2' method='GET'>
+         {% csrf_token %}
+         <button type='submit' value='1' name='player_number'> Player 1 </button>
+     </form>
+        <form action='/game/display/2' method='GET'>
             {% csrf_token %}
-                <button type='submit' value='2' name='player_number'> Player 2 </button>
-            </form>
+            <button type='submit' value='2' name='player_number'> Player 2 </button>
+        </form>
     </body>
 </html>

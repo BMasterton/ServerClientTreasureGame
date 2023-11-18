@@ -97,7 +97,7 @@ def get_player(request, player_id):
     else:
         return HttpResponse('No such player')
 
-
+# check to see if there is a treasure if there based on the column and row, and if so we add the points to the player and remove them from the board
 def addIfTreasure(playerRow, playerColumn):
     cell = Board.objects.filter(row=playerRow, col=playerColumn).first()
     player = Player.objects.filter(row=playerRow, col=playerColumn).first()
@@ -109,7 +109,7 @@ def addIfTreasure(playerRow, playerColumn):
         cell.value = 0 # this is happening
         cell.save()
 
-
+# checking to see if the column is a player or not
 def isPlayer(playerRow, playerColumn):
     player = Player.objects.filter(row=playerRow, col=playerColumn).first()
     if player:
@@ -172,8 +172,8 @@ def displayPlayer(request, player_number):
 
 
     context = getLabelContext()
-    context['player1_score'] = Player.objects.filter(name=1).first().score # probably need to fix this.
-    context['player2_score'] = Player.objects.filter(name=2).first().score
+    context['player1_score'] = Player.objects.filter(name=1).first().score #getting player points and adding them to the board for palyer 1
+    context['player2_score'] = Player.objects.filter(name=2).first().score # points for player 2
     if player_number == 1: # if its player one then display player1's unique html
         return render(request, 'Player1Display.html', context)
     if player_number == 2:
