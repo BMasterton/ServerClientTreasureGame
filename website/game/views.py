@@ -126,7 +126,7 @@ def getLabelContext():
     labels = [['.' for _ in range(10)] for _ in range(10)] # creating a 10 x 10 matrix //either add the '.' here
     for data in board_data:
         row, col = data.row , data.col 
-        labels[row][col] = data.label if data.value else '.' #or maybe here
+        labels[row][col] = data.label if data.value else '.'
     for data in player_data:
         row, col = data.row , data.col 
         labels[row][col] = data.name if data.name else '.'
