@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Player 1 Board</title>
+        <!-- Latest compiled and minified CSS -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+            <!-- Optional theme -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+            <!-- Latest compiled and minified JavaScript -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    </head>
+    <body>
+     <H2> P1 Game </H2>
+
+        <form action="" method="post">
+        {% csrf_token %}
+        <table class="table table-bordered"  >
+
+            <tbody>
+             {% for row_labels in labels %}
+                <tr>
+                {% for label in row_labels %}
+                    <td style="width: 20px" style="height: 20px" >
+                        {{ label }}
+                    </td>
+                      {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+            <button type="submit" class="btn btn-primary" value="U" name="player_direction"> UP </button>
+            <button type="submit" class="btn btn-primary" value="D" name="player_direction"> DOWN </button>
+            <button type="submit" class="btn btn-primary" value="L" name="player_direction"> LEFT </button>
+            <button type="submit" class="btn btn-primary" value="R" name="player_direction"> RIGHT </button>
+    </form>
+       <H4>Player 1 Score: {{ player1_score }}</H4>
+    <H4> Player 2 Score:  {{ player2_score }}</H4>
+    </body>
+</html>
