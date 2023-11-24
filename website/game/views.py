@@ -57,9 +57,17 @@ def display(request):
     context = getLabelContext() # all data in the board is returned from this, anything that has a value
     return render(request, "board_form.html", context)
 
+def deleteAndAddObjects():
+    Board.objects.all().delete()
+    Player.objects.all().delete()
+    addTreasure()
+    addPlayer()
+
+
 # creates the game, so we delete all the old objects we created before, and we make the board model, we then 'fill'
 #the board with treasures and players
-class CreateGame(CreateView):
+#class CreateGame(CreateView):
+def createGame(request):
     Board.objects.all().delete()
     Player.objects.all().delete()
     model = Board
@@ -67,6 +75,8 @@ class CreateGame(CreateView):
     addTreasure()
     addPlayer()
     success_url = reverse_lazy('create')
+    data = getLabelContext()
+    return render(request, template_name='board_form.html', context=data)
 
 #Creates the player model
 class PlayerCreate(CreateView):
