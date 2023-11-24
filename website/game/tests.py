@@ -22,105 +22,136 @@ from .views import displayPlayer, display, createGame, playerMove
 #
 #
 class PlayerTestCase(TestCase):
-    # def test_players_populated(self):
-    #     self.client.post('/game/create/')
-    #     self.assertEquals(2, len(Player.objects.all()))
-    def test_move_1(self):
-        response_create_game = self.client.post(reverse('create'))
-        self.assertTrue(response_create_game.status_code, 302)
-        p1 = Player.objects.get(name='1')
-        p1OriginalRow = p1.row
-        response = self.client.post(reverse('display_player', args = [1]),
-                                    {'player_direction': 'U'})
-        self.assertEqual(response.status_code, 200)
-        p1.refresh_from_db()
-        self.assertEqual(p1.row, (p1OriginalRow -1))
 
-    def test_add_player(self):
+    # making sure that 2 players so actually populate when the game is created
+    def test_players_populated(self):
+        #runnign the create command via the url
+        self.client.post('/game/create/')
+        #making sure both players are on the board on creation
+        self.assertEquals(2, len(Player.objects.all()))
+
+        # testing to make sure we can actually move and the correct page is loaded
+    def test_move(self):
+        # creating game
         response_create_game = self.client.post(reverse('create'))
         self.assertTrue(response_create_game.status_code, 302)
         p1 = Player.objects.get(name='1')
+        Board.objects.all().delete() #removing so we dont cause undefined behavior
+        Player.objects.get(name='2').delete() #removing player 2 and placing it where we want
+        p2 = Player()
+        p2.name = '2'
+        p2.row = 9
+        p2.col = 9
+        p2.score = 0
+        p2.save()
+        # settig player one to a corner
         p1.row = 0
         p1.col = 0
-        response = self.client.post(reverse('display_player', args=[1]),
-                                    {'player_direction': 'U'})
-        self.assertFormError(response, 'form', 'row', 'Row out of range')
+        p1.save()
+        # moving the player
+        response = self.client.post(reverse('display_player', args = [1]),
+                                    {'player_direction': 'D'})
+        #making sure the command went through
+        self.assertEqual(response.status_code, 200)
+        p1.refresh_from_db()
+        #making sure the player actually moved
+        self.assertTrue(p1.row== 1)
+
+    # testing all 4 boundary directions to make sure we dont go out of bounds
+    def test_player_boundary(self):
+        response_create_game = self.client.post(reverse('create'))
+        self.assertTrue(response_create_game.status_code, 302)
+        p1 = Player.objects.get(name='1')
+        p2 = Player.objects.get(name='2')
+        # player 1 will be used to check boundaries and so player 2 needs to be in the center to avoid interactions
+        p2.row = 5
+        p2.col = 5
+        #putting player one in the corner so it can test U and R directiosn
+        p1.row = 0
+        p1.col = 0
+        p1.save()
+        #testing Up and Right direction movement and boundaries
+        self.client.post(reverse('display_player', args=[1]),
+                         {'player_direction': 'U'})
+        self.assertTrue(Player.objects.get(name='1').row == 0)
+        self.client.post(reverse('display_player', args=[1]),
+                         {'player_direction': 'R'})
+        self.assertTrue(Player.objects.get(name='1').row == 0)
+        # putting player 1 in the other corner
+        p1.row = 9
+        p1.col = 9
+        p1.save()
+        # testing Down and Left directions and asserting they didnt move d
+        self.client.post(reverse('display_player', args=[1]),
+                         {'player_direction': 'D'})
+        self.assertTrue(Player.objects.get(name='1').row == 9)
+        self.client.post(reverse('display_player', args=[1]),
+                         {'player_direction': 'L'})
+        self.assertTrue(Player.objects.get(name='1').row == 9)
 
 
-    # def test_player_move(self):
-    #     self.client.post('/game/create/')
-    #     player1 = Player.objects.filter(name='1')
-    #     print(player1.row, player1.col)
-    #     player1OGRow = player1.row
-    #     player1OGCol = player1.col
-    #     playerMove('U', 1)
-    #
-    #     self.assertEquals(player1.row == player1OGRow-1)
-#     def test_create(self):
-#         self.client.post('/game/player/create', {'name': '1', 'row': 3, 'col': 7, 'score': 0})
-#         p = Player.objects.get(name='1')
-#         self.assertEquals(p.name, '1')
-#         self.assertEquals(p.row, 3)
-#         self.assertEquals(p.col, 7)
-#         self.assertEquals(p.value, 0)
-#
-#     def test_out_of_bounds_row(self):
-#         response = self.client.post('/game/player/create', {'name': '1', 'row': -8, 'col': 7, 'score': 0})
-#         self.assertFormError(response, 'form', 'row', 'Row out of range')
-#         try:
-#             Player.objects.get(label='1')
-#             self.fail()
-#         except Player.DoesNotExist:
-#             pass
-#
-#     def test_out_of_bounds_col(self):
-#         response = self.client.post('/game/player/create', {'name': '1', 'row': 8, 'col': -7, 'score': 0})
-#         self.assertFormError(response, 'form', 'col', 'Column out of range')
-#         try:
-#             Player.objects.get(label='1')
-#             self.fail()
-#         except Player.DoesNotExist:
-#             pass
+    def test_player_collision(self):
+        # creating the game
+        response_create_game = self.client.post(reverse('create'))
+        self.assertTrue(response_create_game.status_code, 302)
+        #find player locations
+        p1 = Player.objects.get(name='1')
+        p2 = Player.objects.get(name='2')
+        #setting the location of player 1 and two to be next to each other
+        p1.row = 0
+        p1.col = 0
+        p1.save()
+        p2.row = 1
+        p2.col = 0
+        p2.save()
+        #moving the player into the other
+        self.client.post(reverse('display_player', args=[2]),
+                         {'player_direction': 'U'})
+        #making sure player hasnt moved on top of other player
+        self.assertTrue(Player.objects.get(name='2').row == 1) # shouldnt have moved
 
-# # no idea if this will work
-#     def test_unique_name(self):
-#         pass
+    def test_player_score(self):
+        # creating the game
+        response_create_game = self.client.post(reverse('create'))
+        self.assertTrue(response_create_game.status_code, 302)
+        p1 = Player.objects.get(name='1')
+        #removing everything from the board to set in particular spots
+        Board.objects.all().delete()
+        Player.objects.get(name='2').delete()
+        # adding player 2 back in an unintrusive spot as its needed for score printing
+        p2 = Player()
+        p2.name = '2'
+        p2.row = 9
+        p2.col = 9
+        p2.score = 0
+        p2.save()
+        #changing p1s location
+        p1.row = 0
+        p1.col = 0
+        p1.save()
 
-    # test for unqiue name, score in range forboard, board creation, board bounds, player label, palyer score
-    # board cell name, are there 2 players, are there 5 treasures
+        # creating and placing a particular treasure
+        treasure = Board()
+        treasure.label ="$"
+        treasure.row = 0
+        treasure.col = 1
+        treasure.value = 5
+        treasure.save()
 
-# class BoardTestCase(TestCase):
-#     def test_board_populates(self):
-#         self.client.post('/game/create/')
-#         print(Board.objects.all())
-#         self.assertEquals(5, len(Board.objects.all()))
-#
-#         for b in Board.objects.all():
-#             self.assertTrue(b.value > 0)
+        # moving the player to the treasure spot
+        self.client.post(reverse('display_player', args=[1]),
+                         {'player_direction': 'R'})
+        #refreshing so we know where p1 is now
+        p1.refresh_from_db()
+        self.assertEqual(p1.score, 5)
 
-    # def test_create_blank(self):
-    #     self.client.post('/game/create', {'label': '', 'row': 1, 'col': 2, 'score': 0})
-    #     b = Board.objects.get(label='')
-    #     self.assertEquals(b.label, '.')
-    #     self.assertEquals(b.row, 1)
-    #     self.assertEquals(b.col, 2)
-    #     self.assertEquals(b.score, 0)
 
-# # no idea if this will work
-#     def test_create_treasure(self):
-#         self.client.post('/game/create', {'label': '$', 'row': 2, 'col': 3, 'score': 5})
-#         b = Board.objects.get(label='$')
-#         self.assertEquals(b.label, '$')
-#         self.assertEquals(b.row, 2)
-#         self.assertEquals(b.col, 3)
-#         self.assertEquals(b.score, 5)
-#
-# # no idea if this will work
-#     def test_update_player(self):
-#         self.client.post('/game/create', {'label': '$', 'row': 2, 'col': 3, 'score': 5}) # trying to create board cell with treasure
-#         self.client.post('/game/player/update/1', {'row': 0, 'col': 0}) #overriding it and having player now be there
-#         b = Board.objects.get(label='1')
-#         self.assertEquals(b.label, '1')
-#         self.assertEquals(b.row, 0)
-#         self.assertEquals(b.col, 0)
-#         self.assertEquals(b.score, 0) # not sure if needs to be value after player takes points or no
+
+class BoardTestCase(TestCase):
+    def test_board_populates(self):
+        self.client.post('/game/create/')
+        self.assertEquals(5, len(Board.objects.all()))
+
+        for b in Board.objects.all():
+            self.assertTrue(b.value > 0)
+
