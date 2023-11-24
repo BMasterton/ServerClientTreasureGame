@@ -3,24 +3,6 @@ from django.urls import reverse
 
 from .models import Player, Board
 
-from .views import displayPlayer, display, createGame, playerMove
-
-
-# class InitialTestSuite(TestCase):
-#     def test_game_init(self):
-#         response = self.client.get('/game/create')
-#         response = self.client.post('/game/create')
-#         self.assertEquals(5, len(Board.objects.all()))
-#         self.assertEquals(2, len(Player.objects.all()))
-#
-#         for b in Board.objects.all():
-#             self.assertTrue(b.value > 0)
-#
-#         for b in Board.objects.all():
-#             self.assertTre(MIN_TREAUSER <= b.value <= MAX_TREASURE)
-
-#
-#
 class PlayerTestCase(TestCase):
 
     # making sure that 2 players so actually populate when the game is created
