@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-
+#for us there is game behind all the player/ stuff, and the empty one is just game/
 urlpatterns = [
     path('', views.display, name='display'), # default path when people go to our site and look up 127.0.0.1/game/
     path('player/', views.get_all_players, name='players'), # url path to see all players at once

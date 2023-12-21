@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from .models import Player, Board
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
@@ -105,7 +105,7 @@ def get_player(request, player_id):
         player = players[0]
         return HttpResponse(f'Player {player.tag} is at row {player.row} and col {player.col}')
     else:
-        return HttpResponse('No such player')
+        return Http404
 
 # check to see if there is a treasure if there based on the column and row, and if so we add the points to the player and remove them from the board
 def addIfTreasure(playerRow, playerColumn):

@@ -38,8 +38,9 @@ def contact_player(client: socket, player_id:int ):
     global lock, winner
 
     with client:
-        while True:
-            time.sleep(5)  # wait 5 seconds then try and do the rest
+        # while True:
+        while 0 == winner:
+        #     time.sleep(5)  # wait 5 seconds then try and do the rest
             try:
                 total = mathAnswer() # get the total for what x and y are
                 number = int(get_line(client)) # get the clients input using get_line func
@@ -56,6 +57,14 @@ def contact_player(client: socket, player_id:int ):
                 continue
 
 
+def timer():
+    global lock, winner, total
+    while 0 == winner:
+        with lock:
+            if 0 == winner: total = mathAnswer()
+
+        time.sleep(5)
+
 sock = socket(AF_INET, SOCK_STREAM)
 sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 sock.bind((HOST, PORT))
@@ -65,8 +74,12 @@ thread_list = [] # list of all client connections
 for i in range(NUM_CLIENTS): # we want only 2 clients
     sc, _ = sock.accept()
     thread_list.append(Thread(target=contact_player, args=(sc, num_players))) # appending our threads to a list
-    if num_players == 2: # only starting the threads once we have 2
-        thread_list[-1].start() # start the threads together
+    thread_list[-1].start()
+    if num_players ==2:
+            Thread(target = timer).start()
+    # if num_players == 2: # only starting the threads once we have 2
+    #     thread_list[-1].start() # start the threads together
+
     num_players += 1
 #seems to be working with client 2 but not client one, client two will win the game if it is guessed correctly
 # but player one will not

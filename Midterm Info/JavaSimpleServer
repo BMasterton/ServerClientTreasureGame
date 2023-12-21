@@ -1,0 +1,203 @@
+import java.net.*;
+import java.io.*;
+
+public class Server {
+    protected int port;
+
+    public Server(int port) {
+    this.port = port; // caller must validate the port
+    }
+
+    public void serve() {
+        try (
+            ServerSocket serverSocket = new ServerSocket(port); // open a socket
+            Socket clientSocket = serverSocket.accept(); // wait for a connection
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),true); //clientSocket.getOutputStream() is raw binary // PrintWriter() provides println
+            BufferedReader in = new BufferedReader( //provides readln
+                new InputStreamReader(clientSocket.getInputStream())); //clientSocket.getInputStream() is raw binary //InputStreamReader is the decoder
+) {
+            while (true) {
+                String inputLine = in.readLine();
+                if (inputLine == null) {
+                    break;
+            }
+            System.out.println(inputLine);
+            out.println(inputLine);
+            }
+        } catch (IOException e) {
+            System.err.println(e);
+            System.exit(-2);
+        } catch (SecurityException e) {
+            System.err.println(e);
+            System.exit(-3);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e);
+            System.exit(-4);
+        } catch (IllegalBlockingModeException e) {
+            System.err.println(e);
+            System.exit(-6);
+        }
+    }
+}
+
+
+//zip example
+
+import java.net.*;
+import java.io.*;
+import java.nio.channels.*;
+import java.util.zip.*;
+public class Server {
+protected int port;
+public Server(int port) {
+this.port = port;
+}
+public void serve() {
+try (
+ServerSocket serverSocket = new ServerSocket(port);
+Socket clientSocket = serverSocket.accept();
+PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+BufferedReader in = new BufferedReader(
+new InputStreamReader(clientSocket.getInputStream()));
+BufferedOutputStream outFile = new BufferedOutputStream(
+new GZIPOutputStream(new FileOutputStream("Exercise.gz")));
+) {
+
+while (true) {
+String inputLine = in.readLine();
+if (inputLine == null) {
+break;
+}
+System.out.println(inputLine);
+out.println(inputLine);
+outFile.write(inputLine.getBytes(), 0, inputLine.length());
+}
+} catch (IOException e) {
+System.err.println(e);
+System.exit(-2);
+} catch (SecurityException e) {
+System.err.println(e);
+System.exit(-3);
+} catch (IllegalArgumentException e) {
+System.err.println(e);
+System.exit(-4);
+} catch (IllegalBlockingModeException e) {
+System.err.println(e);
+System.exit(-6);
+}
+}
+}
+
+
+// Syncronous multithreaded server using socket
+//a  simple client
+
+import java.io.*;
+import java.net.*;
+
+public class Client {
+    protected String serverName;
+    protected int serverPort;
+    protected String message;
+
+    public Client(String serverName, int serverPort, String message) {
+        this.serverName = serverName;
+        this.serverPort = serverPort;
+        this.message = message;
+    }
+    public void connect() {
+        String reply;
+        try (
+            Socket socket = new Socket(serverName, serverPort); //contact server at this address and port
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // PrintWriter to send message via println
+            BufferedReader in = new BufferedReader( // BufferedReader to read messgage via readLine
+            new InputStreamReader(socket.getInputStream()));
+        ) { while (true) {
+                out.println(this.message); //send the message
+                if ((reply = in.readLine()) == null) { //read the reply from the server; stop if null
+                    break;
+            }
+                System.out.println(reply); //print the reply to stdout
+                Thread.sleep(1000);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+            System.exit(-1);
+        }
+    }
+    public static void main(String[] args) {
+        if (args.length != 3) {
+            System.err.println("Need <host> <port> <message>");
+            System.exit(-2);
+        }
+        Client c = new Client(args[0], Integer.valueOf(args[1]), args[2]);
+        c.connect();
+    }
+}
+
+
+
+
+// Syncronous Multithreaded Server
+
+import java.io.*;
+import java.net.*;
+
+public class Server {
+    protected final String HOST = "";
+    protected int port;
+
+    public Server(int port) {
+        this.port = port;
+    }
+
+    void delegate(Socket clientSocket) { //called by threads
+        try (
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), //has printWriter and BufferedReader like on the client
+                true);
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(clientSocket.getInputStream()));
+        ) {
+            while (true) {
+                String inputLine = in.readLine(); //blocks until new line is read in
+                 if (inputLine == null) {
+                    break; //stops the loop if inputLine is null
+                } synchronized(this) { //avoids scrambled output. Without this, we would hava a race condition. USe sycronized(this) whenever using a shared resource (stdout, shared variable, shared file etc)
+                    System.out.println(inputLine);
+                }
+                    out.println(Thread.currentThread() + inputLine); //send a reply to the client
+                }
+            clientSocket.close();
+        } catch (Exception e) {
+            System.err.println(e);
+            System.exit(-1);
+        }
+    }
+    public void serve() {
+        try (
+            ServerSocket serverSocket = new ServerSocket(port);
+        ) {
+            while(true) {
+                try {
+                    Socket clientSocket = serverSocket.accept(); // dont put clientSocket into resouces clause of the try or it will be closed b4 the thread has a chance to run //.accept blocks until a connection is made
+                    Runnable runnable = () -> this.delegate(clientSocket);
+                    Thread t = new Thread(runnable); //every connection runs in its own thread
+                    t.start();
+                } catch (Exception e) {
+                    System.err.println(e);
+                    System.exit(-2);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+            System.exit(-3);
+        }
+    }
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Need <port>");
+            System.exit(-99);
+        }
+        Server s = new Server(Integer.valueOf(args[0]));
+        s.serve();
+}}
